@@ -3,7 +3,7 @@
 ## System Architecture
 ![image](https://user-images.githubusercontent.com/47752280/200125891-c2d606e8-fffa-482e-a049-a397e995bb70.png)
 
-### Price Prediction:
+### Price Prediction
 ```python
 import wgu3_GAN as prediction
 ```
@@ -20,7 +20,7 @@ GAN model taking the following inputs:
 
 ### Profit/Risk Calculations
 ```python
-import wgu3_profit-risk.py as confidence
+import wgu3_profit-risk as feasability
 ```
 
 - calculate all points (long and short) where after comission and safety margin a profit can be made (using now, low and high of period as purchase times?)
@@ -31,6 +31,8 @@ import wgu3_profit-risk.py as confidence
 ```python
 import wgu3_strategyEngine as strategy
 ```
+
+Evaluate all possible orders using confidence values, upside/downside potential and potentially later an Order Evalutaion CNN.
 
 Simple initial strategy for stock:
 ```
@@ -44,7 +46,16 @@ if predicted profit >= x%:
 Next implement algorithm that takes into account the profit/risk ratio and later other factors that may be relevant when making deisions about investment strategies
 
 
-### Order/Position Manager:
+### Order/Position Manager
+```python
+import wgu3_orderBook as orderBook
+```
+
 - shedule oders
 - monitor all currentpositions. if any deviate more than the prediction error then initialise Crisis Manager.
+
+### Crisis Manager
+```python
+import wgu3_crisisManager as crisis
+```
     
