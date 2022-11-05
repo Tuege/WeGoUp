@@ -5,6 +5,8 @@ import pandas as pd
 import numpy as np
 import yfinance as yf
 
+import threading
+
 if backtesting:
     import wgu3_gan.gan_bt      as prediction
     #from wgu3_profit_risk       import profit_risk_bt   as feasibility
