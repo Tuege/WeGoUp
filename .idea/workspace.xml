@@ -6,9 +6,10 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="trying ways to auto reload modules">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/proto_main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/proto_main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/proto_main.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -102,6 +103,7 @@
     <MESSAGE value="added Mark I and II" />
     <MESSAGE value="added more modules" />
     <MESSAGE value="trying ways to auto reload modules" />
-    <option name="LAST_COMMIT_MESSAGE" value="trying ways to auto reload modules" />
+    <MESSAGE value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
+    <option name="LAST_COMMIT_MESSAGE" value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
   </component>
 </project>
