@@ -5,7 +5,11 @@
 
 ### Price Prediction
 ```python
-import wgu3_GAN as prediction
+from wgu3_gan import gan
+
+# Live trading .... gan.Gan()
+# Backtesting ..... gan.GanBT()
+prediction = gan.Gan()
 ```
 
 GAN model taking the following inputs:
@@ -46,13 +50,22 @@ if predicted profit >= x%:
 Next implement algorithm that takes into account the profit/risk ratio and later other factors that may be relevant when making deisions about investment strategies
 
 
-### Order/Position Manager
+### Realtime Position/Exposure Manager
 ```python
 import wgu3_orderBook as orderBook
 ```
 
-- shedule oders
+- schedule oders
 - monitor all currentpositions. if any deviate more than the prediction error then initialise Crisis Manager.
+
+__The following are some popular risk management rules:__
+
+- [ ] Position limit: Control the upper limit of the position of a specified instrument, or the sum of all positions of instruments for a specified product.
+- [ ] Single-order limit: Control the upper limit of the volume of single order. Sometimes, control the lower limit of the volume of single order, which means that the quantity of your order must be a multiple of it.
+- [ ] Money control: Control the margin of all positions not to exceed the balance of the account.
+- [ ] Illegal price detection: Ensure the price is within a reasonable range, such as not exceed price limit, or not too far from the current price.
+- [ ] Self-trading detection: Ensure the orders from different strategies will not cause any possibility of trade between them.
+- [ ] Order cancellation rate: Calculate the order cancellation situation and ensure it does not exceed the limitation of exchange.
 
 ### Crisis Manager
 ```python
