@@ -1,35 +1,26 @@
-# %% Backtesting
-backtesting = False
+'''
+Tuege Neumann
+06.11.2022
 
-# %% Imports
+A GAN based approach to Algorithmic Trading
+
+'''
+#%% Imports
+import sys
+import threading
 
 import pandas as pd
 import numpy as np
 import yfinance as yf
 
-import threading
-
-try:
-    del sys.modules["wgu3_gan.gan"]
-    del wgu3_gan.gan
-except (KeyError, NameError):
-    pass
-try:
-    print(str(wgu3_profit_risk.profit_risk))
-    del sys.modules["wgu3_profit_risk.profit_risk"]
-    del wgu3_profit_risk.profit_risk
-except (KeyError, NameError):
-    pass
-try:
-    del sys.modules["wgu3_strategy_engine.strategy_engine"]
-    del wgu3_strategy_engine.strategy_engine
-except (KeyError, NameError):
-    pass
-
-
 from wgu3_gan import gan
 from wgu3_profit_risk import profit_risk
 from wgu3_strategy_engine import strategy_engine
+
+#%% Backtesting [enable/disable]
+backtesting = True
+
+#%% Module Object Instantiation
 
 if backtesting:
     prediction = gan.GanBT()
@@ -40,12 +31,13 @@ else:
     feasibility = profit_risk.ProfitRisk()
     strategy = strategy_engine.StrategyEngine()
 
-# %%
+#%% Threads Setup
 
 print("Hello World!")
 prediction.run()
-# p = gan.backtesting()
-# print(p.run())
+feasibility.run()
+strategy.run()
 
 
-# %%
+#%% System Exit
+sys.exit(101)
