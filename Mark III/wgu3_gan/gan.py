@@ -1,9 +1,7 @@
-print(__name__)
-#%%
-from . import gan_bt
-#%%
-import pandas
 
-def run(self):
-    print("Using Live Data")
-    return False
+class live():
+    def __init__(self):
+        print("live initialised")
+
+    def run(self):
+        print("run executed")
