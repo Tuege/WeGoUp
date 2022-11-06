@@ -1,6 +1,6 @@
-class Gan:
+class ProfitRisk:
     def __init__(self):
-        print("Gan module ................. instantiated")
+        print("Profit/Risk module ......... instantiated")
 
     def reformat(self):
         print("data reformatted")
@@ -10,9 +10,9 @@ class Gan:
         return False
 
 
-class GanBT(Gan):
+class ProfitRiskBT(ProfitRisk):
     def __init__(self):
-        print("Gan module instantiated --- Backtesting enabled ---")
+        print("Profit/Risk module instantiated --- Backtesting enabled ---")
 
     def run(self):
         self.reformat()

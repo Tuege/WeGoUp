@@ -1,43 +1,50 @@
-
+# %% Backtesting
 backtesting = False
+
+# %% Imports
 
 import pandas as pd
 import numpy as np
 import yfinance as yf
 
 import threading
-del sys.modules["wgu3_gan.gan"]
-del wgu3_gan.gan
+
+try:
+    del sys.modules["wgu3_gan.gan"]
+    del wgu3_gan.gan
+except (KeyError, NameError):
+    pass
+try:
+    print(str(wgu3_profit_risk.profit_risk))
+    del sys.modules["wgu3_profit_risk.profit_risk"]
+    del wgu3_profit_risk.profit_risk
+except (KeyError, NameError):
+    pass
+try:
+    del sys.modules["wgu3_strategy_engine.strategy_engine"]
+    del wgu3_strategy_engine.strategy_engine
+except (KeyError, NameError):
+    pass
+
 from wgu3_gan import gan
-#del sys.modules["moduleName"]
-#del moduleName
-#import wgu3_gan.gan
-#from wgu3_gan import gan
-#import wgu3_gan
-#from wgu3_gan.gan import live
-
-#print(dir(wgu3_gan.gan))
-
+from wgu3_profit_risk import profit_risk
+from wgu3_strategy_engine import strategy_engine
 
 if backtesting:
-    pass
-    #import wgu3_gan.gan_bt      as prediction
     prediction = gan.GanBT()
-    #from wgu3_profit_risk       import profit_risk_bt   as feasibility
-    #from wgu3_strategyEngine    import algorithm_bt     as strategy
+    feasibility = profit_risk.ProfitRiskBT()
+    strategy = strategy_engine.StrategyEngineBT()
 else:
-    pass
-    #import wgu3_gan.gan         as prediction
     prediction = gan.Gan()
-    #from wgu3_profit_risk       import profit_risk      as feasibility
-    #from wgu3_strategyEngine    import algorithm        as strategy
+    feasibility = profit_risk.ProfitRisk()
+    strategy = strategy_engine.StrategyEngine()
 
+# %%
 
 print("Hello World!")
 prediction.run()
-#p = gan.backtesting()
-#print(p.run())
+# p = gan.backtesting()
+# print(p.run())
 
-#%%
-'New execution section'
 
+# %%
