@@ -1,10 +1,10 @@
-'''
+"""
 Tuege Neumann
 06.11.2022
 
 A GAN based approach to Algorithmic Trading
 
-'''
+"""
 #%% Imports
 import sys
 import threading
@@ -33,8 +33,17 @@ else:
 
 #%% Threads Setup
 
-print("Hello World!")
-prediction.run()
+stockDataLock = threading.Lock()
+technicalIndicatorLock = threading.Lock()
+correlatedAssetsLock = threading.Lock()
+fourierLock = threading.Lock()
+arimaLock = threading.Lock()
+predictionsLock = threading.Lock()
+
+stockDataLock.acquire()
+stockDataLock.release()
+
+prediction.run(predictionsLock)
 feasibility.run()
 strategy.run()
 
