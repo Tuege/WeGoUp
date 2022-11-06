@@ -26,6 +26,7 @@ try:
 except (KeyError, NameError):
     pass
 
+
 from wgu3_gan import gan
 from wgu3_profit_risk import profit_risk
 from wgu3_strategy_engine import strategy_engine
