@@ -33,19 +33,22 @@ else:
 
 #%% Threads Setup
 
+'Locks'
 stockDataLock = threading.Lock()
 technicalIndicatorLock = threading.Lock()
 correlatedAssetsLock = threading.Lock()
 fourierLock = threading.Lock()
 arimaLock = threading.Lock()
-predictionsLock = threading.Lock()
+predictionLock = threading.Lock()
 
-stockDataLock.acquire()
-stockDataLock.release()
+'Threads'
+predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
+strategyThread = threading.Thread(target=strategy.run, args=(predictionThread, predictionLock))
 
-prediction.run(predictionsLock)
-feasibility.run()
-strategy.run()
+'Start the program'
+strategyThread.start()
+#FIXME: The locking mechanism doesn't work properly yet
+#       Strategy still has access to the predictions when it shouldn't have.
 
 
 #%% System Exit
