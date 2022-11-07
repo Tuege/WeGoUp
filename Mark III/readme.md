@@ -1,7 +1,7 @@
 # Mark III
 
 ## System Architecture
-![image](https://user-images.githubusercontent.com/47752280/200125891-c2d606e8-fffa-482e-a049-a397e995bb70.png)
+![image](https://user-images.githubusercontent.com/47752280/200331818-436ab11d-d761-457e-88cc-0f6d237a7162.png)
 
 ### Price Prediction
 ```python
