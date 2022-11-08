@@ -6,8 +6,11 @@ class Gan:
         print("data reformatted")
 
     def run(self, lock):
+        self.runGan()
+        with lock:
+            self.updatePrediction(1)
+            print("Prediction: Prediction updated")
         print("run finished")
-        return False
 
     def updatePrediction(self, output):
         publicPrediction = output
@@ -18,10 +21,5 @@ class Gan:
 
 class GanBT(Gan):
     def __init__(self):
-        print("Gan module instantiated --- Backtesting enabled ---")
+        print("Gan module instantiated              --- Backtesting enabled ---")
 
-    def run(self, lock):
-        self.runGan()
-        with lock:
-            self.updatePrediction(1)
-            print("Prediction: Prediction updated")

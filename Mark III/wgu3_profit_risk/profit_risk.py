@@ -12,7 +12,7 @@ class ProfitRisk:
 
 class ProfitRiskBT(ProfitRisk):
     def __init__(self):
-        print("Profit/Risk module instantiated --- Backtesting enabled ---")
+        print("Profit/Risk module instantiated      --- Backtesting enabled ---")
 
     def run(self):
         self.reformat()

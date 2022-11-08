@@ -15,13 +15,11 @@ class StrategyEngine:
 
 class StrategyEngineBT(StrategyEngine):
     def __init__(self):
-        print("Strategy Engine module instantiated --- Backtesting enabled ---")
+        print("Strategy Engine module instantiated  --- Backtesting enabled ---")
 
     def run(self, prediction_thread, lock):
         prediction_thread.start()
         prediction_thread.join()
-        if lock.locked():
-            print
         with lock:
             print("Strategy: reading out the prediction results")
         print("Strategy: run back-tested")
