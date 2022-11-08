@@ -17,6 +17,7 @@ from wgu3_gan import gan
 from wgu3_profit_risk import profit_risk
 from wgu3_strategy_engine import strategy_engine
 
+
 #%% Backtesting [enable/disable]
 backtesting = True
 
@@ -30,6 +31,8 @@ else:
     prediction = gan.Gan()
     feasibility = profit_risk.ProfitRisk()
     strategy = strategy_engine.StrategyEngine()
+
+print("____________________________________________________________________\n")
 
 #%% Threads Setup
 
@@ -47,9 +50,6 @@ strategyThread = threading.Thread(target=strategy.run, args=(predictionThread, p
 
 'Start the program'
 strategyThread.start()
-#FIXME: The locking mechanism doesn't work properly yet
-#       Strategy still has access to the predictions when it shouldn't have.
-
 
 #%% System Exit
 sys.exit(101)
