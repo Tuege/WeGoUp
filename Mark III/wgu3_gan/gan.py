@@ -13,7 +13,7 @@ class Gan:
         publicPrediction = output
 
     def runGan(self):
-        print("Prediction: Predicting Stock Movement\n")
+        print("Prediction: Predicting Stock Movement")
 
 
 class GanBT(Gan):
@@ -22,8 +22,6 @@ class GanBT(Gan):
 
     def run(self, lock):
         self.runGan()
-        while not lock.acquire(blocking=True):
-            print("Prediction: Block Failed!")
-        self.updatePrediction(1)
-        print("Prediction: Prediction updated\n")
-        lock.release()
+        with lock:
+            self.updatePrediction(1)
+            print("Prediction: Prediction updated")

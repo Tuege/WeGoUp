@@ -19,8 +19,10 @@ class StrategyEngineBT(StrategyEngine):
 
     def run(self, prediction_thread, lock):
         prediction_thread.start()
-        while not lock.acquire(blocking=True):
-            pass
-        print("Strategy: reading out the prediction results\n")
-        lock.release()
+        prediction_thread.join()
+        if lock.locked():
+            print
+        with lock:
+            print("Strategy: reading out the prediction results")
         print("Strategy: run back-tested")
+

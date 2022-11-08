@@ -6,9 +6,8 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment=".">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="add comment here">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/main.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_gan/gan.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_strategy_engine/strategy_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_strategy_engine/strategy_engine.py" afterDir="false" />
     </list>
@@ -107,6 +106,7 @@
     <MESSAGE value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
     <MESSAGE value="renaming main" />
     <MESSAGE value="." />
-    <option name="LAST_COMMIT_MESSAGE" value="." />
+    <MESSAGE value="added partial threading" />
+    <option name="LAST_COMMIT_MESSAGE" value="added partial threading" />
   </component>
 </project>
