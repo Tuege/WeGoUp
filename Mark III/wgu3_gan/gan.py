@@ -6,11 +6,11 @@ class Gan:
         print("data reformatted")
 
     def run(self, lock):
-        self.runGan()
-        with lock:
-            self.updatePrediction(1)
-            print("Prediction: Prediction updated")
-        print("run finished")
+        while True:
+            self.runGan()
+            with lock:
+                self.updatePrediction(1)
+                print("Prediction: Prediction updated")
 
     def updatePrediction(self, output):
         publicPrediction = output

@@ -2,25 +2,24 @@ class StrategyEngine:
     def __init__(self):
         print("Strategy Engine module ..... instantiated")
 
-    def method_a(self):
+    def opportunity(self):
+        print("Opportunity: Finding profitable time periods")
+
+    def feasibility(self):
         pass
 
-    def method_b(self):
-        pass
+    def get_prediction(self, prediction_lock):
+        with prediction_lock:
+            #TODO: add the correct variable for prediction
+            self.current_prediction = None
+            print("Strategy Engine: reading out the prediction results")
 
     def run(self, prediction_thread, lock):
-        print("run finished")
-        return False
+        while True:
+            self.get_prediction(lock)
+            print("Strategy Engine: Strategising about")
 
 
 class StrategyEngineBT(StrategyEngine):
     def __init__(self):
         print("Strategy Engine module instantiated  --- Backtesting enabled ---")
-
-    def run(self, prediction_thread, lock):
-        prediction_thread.start()
-        prediction_thread.join()
-        with lock:
-            print("Strategy: reading out the prediction results")
-        print("Strategy: run back-tested")
-

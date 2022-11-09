@@ -14,7 +14,6 @@ import numpy as np
 import yfinance as yf
 
 from wgu3_gan import gan
-from wgu3_profit_risk import profit_risk
 from wgu3_strategy_engine import strategy_engine
 from wgu3_position_manager import position_manager
 
@@ -26,12 +25,10 @@ backtesting = True
 
 if backtesting:
     prediction = gan.GanBT()
-    feasibility = profit_risk.ProfitRiskBT()
     strategy = strategy_engine.StrategyEngineBT()
     position = position_manager.PositionManagerBT()
 else:
     prediction = gan.Gan()
-    feasibility = profit_risk.ProfitRisk()
     strategy = strategy_engine.StrategyEngine()
     position = position_manager.PositionManager()
 
@@ -49,10 +46,11 @@ predictionLock = threading.Lock()
 
 'Threads'
 predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
-strategyThread = threading.Thread(target=strategy.run, args=(predictionThread, predictionLock))
-positionThread = threading.Thread(target=position.run)
+strategyThread = threading.Thread(target=strategy.run, args=(predictionLock,))
+positionThread = threading.Thread(target=position.run, args=(predictionLock,))
 
 'Start the program'
+predictionThread.start()
 strategyThread.start()
 positionThread.start()
 
