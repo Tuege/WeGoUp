@@ -8,6 +8,7 @@ A GAN based approach to Algorithmic Trading
 #%% Imports
 import sys
 import threading
+import atexit
 
 import pandas as pd
 import numpy as np
@@ -43,16 +44,52 @@ correlatedAssetsLock = threading.Lock()
 fourierLock = threading.Lock()
 arimaLock = threading.Lock()
 predictionLock = threading.Lock()
+sequentialLock = threading.Lock()
+
+'Events'
+exit_event = threading.Event()
 
 'Threads'
-predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
-strategyThread = threading.Thread(target=strategy.run, args=(predictionLock,))
+#predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
+#strategyThread = threading.Thread(target=strategy.run, args=(predictionLock,))
 positionThread = threading.Thread(target=position.run, args=(predictionLock,))
 
-'Start the program'
-predictionThread.start()
-strategyThread.start()
-positionThread.start()
 
-#%% System Exit
-sys.exit(101)
+def strategy_engine_function():
+    t = threading.Timer(0.5, strategy_engine_function)
+    t.start()
+
+    print("1: Prediction Fetched")
+    print("1: Opportunities Identified")
+    print("1: Feasibility Assessed")
+    print("1: Strategy Selected")
+    print("1: Orders Passed To Position Manager")
+
+
+def position_manager_function():
+    print("0: Current Prediction Fetched")
+    print("0: Monitoring Current Positions")
+    print("0: Assess Improvements To Strategy")
+    print("0: Acquire New Positions")
+    print("0: Sell old positions")
+
+def safe_system_exit():
+    exit_event.set()
+    positionThread.join()
+    #with sequentialLock:
+    sys.exit("System safely shut down")
+
+'Start the program'
+if __name__ == '__main__':
+    atexit.register(safe_system_exit)
+    ready_event = threading.Event()
+    position.pass_event(exit_event)
+    t = threading.Timer(0.5, prediction.run)
+    t.daemon = True
+    t.start()
+    positionThread = threading.Thread(target=position.run, args=(sequentialLock,))
+    positionThread.daemon = True
+    positionThread.start()
+
+    while True:
+        pass
