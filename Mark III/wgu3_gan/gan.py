@@ -1,3 +1,7 @@
+import sys
+import threading
+
+
 class Gan:
     def __init__(self):
         print("Gan module ................. instantiated")
@@ -5,12 +9,13 @@ class Gan:
     def reformat(self):
         print("data reformatted")
 
-    def run(self, lock):
-        while True:
-            self.runGan()
-            with lock:
-                self.updatePrediction(1)
-                print("Prediction: Prediction updated")
+    def run(self):
+        with priority_lock:
+            pass
+        t = threading.Timer(0.5, self.run)
+        t.daemon = True
+        t.start()
+        print("1: Strategy recalculating")
 
     def updatePrediction(self, output):
         publicPrediction = output
