@@ -37,7 +37,8 @@ ES_futures__contract.exchange = 'GLOBEX'
 ES_futures__contract.lastTradeDateOrContractMonth  = '20221216'
 
 # Request historical candles
-app.reqHistoricalData(1, ES_futures__contract, '', '2 D', '1 hour', 'BID', 0, 2, False, [])
+#after mid (data type), 0 for only regular trading hours data and 1 for outside RTH
+app.reqHistoricalData(1, ES_futures__contract, '', '1 D', '1 min', 'MIDPOINT', 1, 2, False, [])
 
 time.sleep(5)  # sleep to allow enough time for data to be returned
 
@@ -46,7 +47,7 @@ import pandas
 
 df = pandas.DataFrame(app.data, columns=['DateTime', 'Close'])
 df['DateTime'] = pandas.to_datetime(df['DateTime'],unit='s')
-df.to_csv('ES_futures_hourly.csv')
+df.to_csv('ES_futures_data.csv')
 print('complete')
 print(df)
 
