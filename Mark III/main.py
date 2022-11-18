@@ -11,7 +11,7 @@ import atexit
 
 import pandas as pd
 import numpy as np
-#import yfinance as yf
+import yfinance as yf
 
 from wgu3_prediction_engine import prediction_engine
 from wgu3_strategy_engine import strategy_engine
