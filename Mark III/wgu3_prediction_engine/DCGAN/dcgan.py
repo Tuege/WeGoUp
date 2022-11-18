@@ -134,7 +134,7 @@ def train():
     # ------------------------------------------------------------------------------------------------------------
     # region 2. TRAINING
     # region TRAINING PARAMETERS
-    EPOCHS = 400
+    EPOCHS = 50
     noise_dim = 100
     num_examples_to_generate = 16
 
