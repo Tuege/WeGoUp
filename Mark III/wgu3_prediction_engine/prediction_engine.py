@@ -1,7 +1,8 @@
 import sys
 import threading
+from gan import gan
 
-class Gan:
+class PredictionEngine:
     def __init__(self):
         print("Gan module ................. instantiated")
 
@@ -23,7 +24,7 @@ class Gan:
         print("Prediction: Predicting Stock Movement")
 
 
-class GanBT(Gan):
+class PredictionEngineBT(PredictionEngine):
     def __init__(self):
         print("Gan module instantiated              --- Backtesting enabled ---")
 

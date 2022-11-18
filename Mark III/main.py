@@ -4,7 +4,7 @@ Tuege Neumann
 A GAN based approach to Algorithmic Trading
 
 """
-#%% Imports
+# %% Imports
 import sys
 import threading
 import atexit
@@ -17,23 +17,23 @@ from wgu3_prediction_engine import prediction_engine
 from wgu3_strategy_engine import strategy_engine
 from wgu3_position_manager import position_manager
 
-#%% Backtesting [enable/disable]
+# %% Backtesting [enable/disable]
 backtesting = True
 
-#%% Module Object Instantiation
+# %% Module Object Instantiation
 
 if backtesting:
-    prediction = prediction_engine.GanBT()
+    prediction = prediction_engine.PredictionEngineBT()
     strategy = strategy_engine.StrategyEngineBT()
     position = position_manager.PositionManagerBT()
 else:
-    prediction = prediction_engine.Gan()
+    prediction = prediction_engine.PredictionEngine()
     strategy = strategy_engine.StrategyEngine()
     position = position_manager.PositionManager()
 
 print("____________________________________________________________________\n")
 
-#%% Threads Setup
+# %% Threads Setup
 
 'Locks'
 stockDataLock = threading.Lock()
@@ -48,14 +48,14 @@ sequentialLock = threading.Lock()
 exit_event = threading.Event()
 
 'Threads'
-#predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
-#strategyThread = threading.Thread(target=strategy.run, args=(predictionLock,))
+# predictionThread = threading.Thread(target=prediction.run, args=(predictionLock,))
+# strategyThread = threading.Thread(target=strategy.run, args=(predictionLock,))
 positionThread = threading.Thread(target=position.run, args=(predictionLock,))
 
 
 def strategy_engine_function():
-    t = threading.Timer(0.5, strategy_engine_function)
-    t.start()
+    t_period = threading.Timer(0.5, strategy_engine_function)
+    t_period.start()
 
     print("1: Prediction Fetched")
     print("1: Opportunities Identified")
@@ -71,11 +71,13 @@ def position_manager_function():
     print("0: Acquire New Positions")
     print("0: Sell old positions")
 
+
 def safe_system_exit():
     exit_event.set()
     positionThread.join()
-    #with sequentialLock:
+    # with sequentialLock:
     sys.exit("System safely shut down")
+
 
 'Start the program'
 if __name__ == '__main__':

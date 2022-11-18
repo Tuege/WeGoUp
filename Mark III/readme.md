@@ -10,7 +10,7 @@ from wgu3_prediction_engine import prediction_engine
 
 # Live trading .... gan.Gan()
 # Backtesting ..... gan.GanBT()
-prediction = prediction_engine.Gan()
+prediction = prediction_engine.PredictionEngine()
 ```
 
 GAN model taking the following inputs:
