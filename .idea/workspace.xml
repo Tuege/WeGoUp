@@ -9,13 +9,9 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="fixing file types">
-      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added concurrent support for tensorflow and other processes">
+      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/main.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/readme.md" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/readme.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/prediction_engine.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/prediction_engine.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -47,17 +43,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "TODO_SCOPE": "All Places",
-    "WebServerToolWindowFactoryState": "false",
-    "codeWithMe.voiceChat.enabledByDefault": "false",
-    "last_opened_file_path": "P:/Downloads/DCGAN/GAN breakdown.md",
-    "settings.editor.selected.configurable": "CodeWithMe"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;P:/Downloads/DCGAN/GAN breakdown.md&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;CodeWithMe&quot;
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Tüge\PycharmProjects\WeGoUp\Mark III\wgu3_prediction_engine" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="main" type="PythonConfigurationType" factoryName="Python" singleton="false">
       <module name="Mark III" />
@@ -104,7 +105,14 @@
       <option name="project" value="LOCAL" />
       <updated>1668791684270</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="added DCGAN">
+      <created>1668799885391</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1668799885391</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -142,7 +150,8 @@
     <MESSAGE value="added partial threading" />
     <MESSAGE value="changed gan to prediction_engine" />
     <MESSAGE value="fixing file types" />
-    <option name="LAST_COMMIT_MESSAGE" value="fixing file types" />
+    <MESSAGE value="added DCGAN" />
+    <option name="LAST_COMMIT_MESSAGE" value="added DCGAN" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
