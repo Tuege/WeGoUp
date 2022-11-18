@@ -1,7 +1,6 @@
 """
 Tuege Neumann
 06.11.2022
-
 A GAN based approach to Algorithmic Trading
 
 """
@@ -12,12 +11,11 @@ import atexit
 
 import pandas as pd
 import numpy as np
-import yfinance as yf
+#import yfinance as yf
 
-from wgu3_gan import gan
+from wgu3_prediction_engine import prediction_engine
 from wgu3_strategy_engine import strategy_engine
 from wgu3_position_manager import position_manager
-
 
 #%% Backtesting [enable/disable]
 backtesting = True
@@ -25,11 +23,11 @@ backtesting = True
 #%% Module Object Instantiation
 
 if backtesting:
-    prediction = gan.GanBT()
+    prediction = prediction_engine.GanBT()
     strategy = strategy_engine.StrategyEngineBT()
     position = position_manager.PositionManagerBT()
 else:
-    prediction = gan.Gan()
+    prediction = prediction_engine.Gan()
     strategy = strategy_engine.StrategyEngine()
     position = position_manager.PositionManager()
 
