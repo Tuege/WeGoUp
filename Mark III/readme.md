@@ -2,6 +2,8 @@
 
 ## System Architecture
 ![image](https://user-images.githubusercontent.com/47752280/200331818-436ab11d-d761-457e-88cc-0f6d237a7162.png)
+![image](https://user-images.githubusercontent.com/47752280/202907557-5fef46a5-ca08-417d-ba82-8d1e61cc5867.png)
+
 
 ### Price Prediction
 
@@ -22,6 +24,8 @@ GAN model taking the following inputs:
 - [ ] fourier analysis
 - [ ] sentiment analysis
 - [ ] autoencoders
+
+![image](https://user-images.githubusercontent.com/47752280/202906159-57004424-1b58-4b40-b839-432d39677215.png)
 
 ### Profit/Risk Calculations
 ```python
