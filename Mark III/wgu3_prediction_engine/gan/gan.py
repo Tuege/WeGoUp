@@ -12,9 +12,10 @@ from tensorflow.keras import layers
 from stockstats import StockDataFrame
 from stockstats import wrap, unwrap
 import multiprocessing as mp
+import time
 
-def train(disp_queue: mp.Queue):
-    stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
+
+def data_preprocessing(stock_data):
     stock_data.columns = stock_data.columns.str.lower()
     """
     stock_data = wrap(stock_data)
@@ -116,7 +117,12 @@ def train(disp_queue: mp.Queue):
 
     x_test = np.array(x_test)
     x_test = np.reshape(x_test, (x_test.shape[0], x_test.shape[1], x_test.shape[2]))
+    return x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len
 
+
+def train(disp_queue: mp.Queue):
+    stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
+    x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
 
     def scheduler(epoch, lr):
         if epoch < 1:
@@ -126,35 +132,12 @@ def train(disp_queue: mp.Queue):
             # print(lr * tf.math.exp(-0.1))
             # return lr * tf.math.exp(-0.1)
 
-
     callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
     rmse_list = []
+    error_list = []
     predictions_list = []
     x_train_original, y_train_original = x_train, y_train
-
-
-    """
-    fig_error = plt.figure()
-    ax_error = fig_error.add_subplot(1,1,1)
-    ax_error.set_title('Error')
-    ax_error.set_xlabel('Range of Dates used for Training')
-    ax_error.set_ylabel('RMS Error')
-    #ax_error.plot(rmse_list)
-
-
-    def animate():
-        ax_error.clear()
-        ax_error.plot(rmse_list)
-
-
-    def anim_proc():
-        ani = animation.FuncAnimation(fig_error, animate, interval=1000)
-        plt.show()
-
-    anim_process = mp.Process(target=animate)
-    anim_process.start()
-    """
 
     with tf.device('/GPU:0'):
         model = keras.Sequential()
@@ -166,21 +149,24 @@ def train(disp_queue: mp.Queue):
 
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
 
-        for training_shift in range(0, 100, 1):
+        for training_shift in range(0, 1000, 1):
             x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
-            model.fit(x_train, y_train, batch_size=1, epochs=3, callbacks=[callback])
+            model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[callback])
 
             predictions = model.predict(x_test, verbose=False)
 
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
             target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
-            predictions_list.append(predictions)
             rmse = np.sqrt(np.mean(predictions - target) ** 2)
+            error = np.sum(np.absolute(predictions - target))
+            predictions_list.append(predictions)
             rmse_list.append(rmse)
-            disp_queue.put([rmse_list, target, predictions])
+            error_list.append(error)
+            if (error == min(error_list)) and (rmse < 5):
+                print(training_shift)
+                model.save('optimal_model2')
+            disp_queue.put([rmse_list, target, predictions, error_list])
             print(rmse_list)
-
-
 
     data = stock_data.filter(['close'])
     train = data[:training_data_len]
@@ -208,20 +194,47 @@ def train(disp_queue: mp.Queue):
         case 'Important':
             best_index = rmse_list.index(min(rmse_list))
             worst_index = rmse_list.index(max(rmse_list))
+            best_error_index = error_list.index(min(error_list))
             validation[str(best_index)] = predictions_list[best_index]
             validation[str(worst_index)] = predictions_list[worst_index]
-            line_list.append(plt.plot(validation[[str(best_index)]], label='Best Prediction')[0])
+            validation[str(best_error_index)] = predictions_list[best_error_index]
+            line_list.append(plt.plot(validation[[str(best_error_index)]], label='Best Prediction: Total Error')[0])
+            line_list.append(plt.plot(validation[[str(best_index)]], label='Best Prediction: RMSE')[0])
             line_list.append(plt.plot(validation[[str(worst_index)]], label='Worst Prediction')[0])
             line_list.append(plt.plot(validation[['predictions']], label='Final Prediction')[0])
-        case 'Animation':
-            """
-            for plot in range(len(predictions_list)):
-                validation[str(plot)] = predictions_list[plot]
-                line_list.append(plt.plot(validation[[str(plot)]], label=str(plot))[0])
-            """
-            ax_error.clear()
-            ax_error.plot(rmse_list)
 
     plt.legend(handles=tuple(line_list), loc='lower right')
     plt.show()
-    sys.exit(0)
+    mp.current_process().terminate()
+
+
+def run():
+    stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
+    x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
+    #y_train = y_train[training_data_len:]
+    #x_train = x_train[training_data_len:]
+
+    reconstructed_model = keras.models.load_model("optimal_model")
+
+    with tf.device('/GPU:0'):
+        t1 = time.time_ns()
+        output = reconstructed_model.predict(x_train)
+        output = np.ravel(scaler_list[0].inverse_transform(output.reshape(-1, 1)))
+        t2 = time.time_ns()
+    print((t2-t1)/1000000)
+
+    plt.figure()
+    plt.plot(output)
+    target = np.ravel(scaler_list[0].inverse_transform(y_train.reshape(-1, 1)))
+    plt.plot(target)
+    rmse = np.sqrt(np.mean(output - target) ** 2)
+    print(3*rmse)
+    plt.fill_between(range(len(output)), output - 3*rmse, output + 3*rmse, alpha=0.2)
+    diff = np.absolute(target - output)
+    count = 0
+    for n in diff:
+        if n > 3*rmse:
+            count += 1
+    reliability = ((len(output)-count)*100)/len(output)
+    print(reliability)
+    plt.show()

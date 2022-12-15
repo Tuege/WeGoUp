@@ -9,9 +9,10 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="working first prototype of LSTM with 6 features. no batches and only partial dataset.">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added live visualisation and fixed rmse bug">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -142,7 +143,14 @@
       <option name="project" value="LOCAL" />
       <updated>1670504985272</updated>
     </task>
-    <option name="localTasksCounter" value="8" />
+    <task id="LOCAL-00008" summary="added live visualisation and fixed rmse bug">
+      <created>1670980798253</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1670980798253</updated>
+    </task>
+    <option name="localTasksCounter" value="9" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -184,7 +192,8 @@
     <MESSAGE value="added concurrent support for tensorflow and other processes" />
     <MESSAGE value="changed number of epochs" />
     <MESSAGE value="working first prototype of LSTM with 6 features. no batches and only partial dataset" />
-    <option name="LAST_COMMIT_MESSAGE" value="working first prototype of LSTM with 6 features. no batches and only partial dataset" />
+    <MESSAGE value="added live visualisation and fixed rmse bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="added live visualisation and fixed rmse bug" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
