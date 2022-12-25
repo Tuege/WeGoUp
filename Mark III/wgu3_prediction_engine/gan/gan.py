@@ -13,6 +13,7 @@ from stockstats import StockDataFrame
 from stockstats import wrap, unwrap
 import multiprocessing as mp
 import time
+import scipy.stats as stats
 
 
 def data_preprocessing(stock_data):
@@ -120,9 +121,14 @@ def data_preprocessing(stock_data):
     return x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len
 
 
-def train(disp_queue: mp.Queue):
+training_shift = None
+
+
+def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
+    global training_shift
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
+
 
     def scheduler(epoch, lr):
         if epoch < 1:
@@ -132,7 +138,11 @@ def train(disp_queue: mp.Queue):
             # print(lr * tf.math.exp(-0.1))
             # return lr * tf.math.exp(-0.1)
 
-    callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
+    class CustomCallbacks(keras.callbacks.Callback):
+        def on_epoch_end(self, epoch, logs=None):
+            prog_queue.put([[epoch+1, 5, 1], [training_shift+1, 200, 1]])
+
+    scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
     rmse_list = []
     error_list = []
@@ -149,9 +159,9 @@ def train(disp_queue: mp.Queue):
 
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
 
-        for training_shift in range(0, 1000, 1):
+        for training_shift in range(0, 200, 1):
             x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
-            model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[callback])
+            model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[scheduler_callback, CustomCallbacks()])
 
             predictions = model.predict(x_test, verbose=False)
 
@@ -164,13 +174,13 @@ def train(disp_queue: mp.Queue):
             error_list.append(error)
             if (error == min(error_list)) and (rmse < 5):
                 print(training_shift)
-                model.save('optimal_model2')
+                model.save('optimal_model3')
             disp_queue.put([rmse_list, target, predictions, error_list])
             print(rmse_list)
 
     data = stock_data.filter(['close'])
     train = data[:training_data_len]
-    validation = data[training_data_len:]  # +4:]
+    validation = data[training_data_len:]
     validation['predictions'] = predictions
     plt.figure(figsize=(16, 8))
     plt.title('Model')
@@ -211,8 +221,6 @@ def train(disp_queue: mp.Queue):
 def run():
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
-    #y_train = y_train[training_data_len:]
-    #x_train = x_train[training_data_len:]
 
     reconstructed_model = keras.models.load_model("optimal_model")
 
@@ -221,20 +229,33 @@ def run():
         output = reconstructed_model.predict(x_train)
         output = np.ravel(scaler_list[0].inverse_transform(output.reshape(-1, 1)))
         t2 = time.time_ns()
-    print((t2-t1)/1000000)
+    print('Inference time: ' + str((t2-t1)/1000000) + 'ms')
 
     plt.figure()
     plt.plot(output)
     target = np.ravel(scaler_list[0].inverse_transform(y_train.reshape(-1, 1)))
     plt.plot(target)
     rmse = np.sqrt(np.mean(output - target) ** 2)
-    print(3*rmse)
-    plt.fill_between(range(len(output)), output - 3*rmse, output + 3*rmse, alpha=0.2)
-    diff = np.absolute(target - output)
+    print('3xRMSE: ' + str(3*rmse))
+
+    diff = target - output
+    diff_abs = np.absolute(diff)
+    std = np.std(target - output)
+    plt.fill_between(range(len(output)), output - 1.5*std, output + 1.5*std, alpha=0.2)
+    print('3xSTD: ' + str(3*std))
+    print('1.5xSTD: ' + str(1.5*std))
     count = 0
-    for n in diff:
-        if n > 3*rmse:
+    for n in diff_abs:
+        if n > 1.5*std:
             count += 1
     reliability = ((len(output)-count)*100)/len(output)
-    print(reliability)
+    print('Reliability of error corridor (1.5std): ' + str(reliability) + '%')
+    print(len(output))
+    plt.figure()
+    counts, bins = np.histogram(diff, bins=100)
+    plt.hist(bins[:-1], bins, weights=counts*(5/len(output)))
+    mu = np.mean(diff)
+    sigma = std
+    x = np.linspace(mu - 10 * sigma, mu + 10 * sigma, 100)
+    plt.plot(x, np.mean(diff)*stats.norm.pdf(x, mu, sigma))
     plt.show()
