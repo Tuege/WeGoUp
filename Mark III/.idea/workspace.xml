@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="b74b02b8-afab-4288-9d0a-de66e4c35b71" name="Changes" comment="jupyter notebook changes">
+      <change beforePath="$PROJECT_DIR$/.idea/Mark III.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Mark III.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <OptionsSetting value="false" id="Update" />
+  </component>
+  <component name="ShelveChangesManager">
+    <option name="remove_strategy" value="true" />
+  </component>
+  <component name="TaskManager">
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+</project>

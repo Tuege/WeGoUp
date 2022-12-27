@@ -129,7 +129,6 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
 
-
     def scheduler(epoch, lr):
         if epoch < 1:
             return lr
@@ -147,6 +146,7 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
     rmse_list = []
     error_list = []
     predictions_list = []
+    batch_time_list = []
     x_train_original, y_train_original = x_train, y_train
 
     with tf.device('/GPU:0'):
@@ -160,6 +160,7 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
 
         for training_shift in range(0, 200, 1):
+            start_time = time.time()
             x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
             model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[scheduler_callback, CustomCallbacks()])
 
@@ -172,10 +173,13 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
             predictions_list.append(predictions)
             rmse_list.append(rmse)
             error_list.append(error)
-            if (error == min(error_list)) and (rmse < 5):
+            end_time = time.time()
+            if (error == min(error_list)) and (rmse < 1):
                 print(training_shift)
                 model.save('optimal_model3')
-            disp_queue.put([rmse_list, target, predictions, error_list])
+            batch_time = end_time-start_time
+            batch_time_list.append(batch_time)
+            disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
             print(rmse_list)
 
     data = stock_data.filter(['close'])

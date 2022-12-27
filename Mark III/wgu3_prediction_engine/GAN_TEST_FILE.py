@@ -39,11 +39,10 @@ def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
 
 
 def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
-    global ani
+    global ani, start_run_time
     ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
 
     if not prog_queue.empty():
-
         pgr_epoch, pgr_batch = prog_queue.get()
         ax_progress.clear()
         ax_progress.axis('off')
@@ -73,9 +72,10 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
                         edgecolor='orange', color='orange', linewidth=0.5, align="edge")
         angle = progress_angle
         #ax_progress.text((-(angle - 90) / 360) * 2 * np.pi, 0.1, 'Batch', fontsize=9, color='orange', ha='center', va='bottom', rotation=-(angle - 90))
+        ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(round(time.time() - start_run_time, 0))) + 's')
 
     if not disp_queue.empty():
-        rmse, target, prediction, error = disp_queue.get()
+        rmse, target, prediction, error, batch_time_list = disp_queue.get()
         old_x_lim = ax_rmse.get_xlim()
         old_y_lim = ax_rmse.get_ylim()
         if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
@@ -103,7 +103,7 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
         # ax_error.clear()
         # ax_error.plot(error, color='#4a8fdd')
         ax_prediction.clear()
-        ax_prediction.plot(target, color='#c75450')#da0f20')
+        ax_prediction.plot(target, color='#c75450')
         prediction_list.append(prediction)
         for n in range(len(prediction_list)):
             ax_prediction.plot(prediction_list[n], color='#4a8fdd', alpha=(1/(len(prediction_list)-n)))
@@ -115,10 +115,13 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
         ax_rmse.set_ylabel('RMSE')
         # ax_error.set_ylabel('Total Error')
 
+        ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(round(np.mean(batch_time_list)))) + 's')
+
     ani.pause()
 
 
 if __name__ == '__main__':
+    global start_run_time
     mp.freeze_support()
     run_mode = 'train'
 
@@ -130,6 +133,7 @@ if __name__ == '__main__':
         case 'train':
             gan_thread = mp.Process(target=gan.train, args=(display_queue, progress_queue), daemon=True)
             gan_thread.start()
+            start_run_time = time.time()
 
             fig = plt.figure(constrained_layout=True)
             gs = GridSpec(2, 2, figure=fig)
