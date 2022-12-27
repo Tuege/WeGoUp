@@ -4,12 +4,13 @@
 ![image](https://user-images.githubusercontent.com/47752280/200331818-436ab11d-d761-457e-88cc-0f6d237a7162.png)
 
 ### Price Prediction
+
 ```python
-from wgu3_gan import gan
+from wgu3_prediction_engine import prediction_engine
 
 # Live trading .... gan.Gan()
 # Backtesting ..... gan.GanBT()
-prediction = gan.Gan()
+prediction = prediction_engine.PredictionEngine()
 ```
 
 GAN model taking the following inputs:

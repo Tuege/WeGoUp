@@ -7,11 +7,13 @@ import time
 
 
 class IBapi(EWrapper, EClient):
-    def __init__(self):
-        EClient.__init__(self, self)
+	def __init__(self):
+		EClient.__init__(self, self)
+		self.data = [] #Initialize variable to store candle
 
-    def historicalData(self, reqId, bar):
-        print(f'Time: {bar.date} Close: {bar.close}')
+	def historicalData(self, reqId, bar):
+		print(f'Time: {bar.date} Close: {bar.close}')
+		self.data.append([bar.date, bar.close])
 
 
 def run_loop():
@@ -25,17 +27,29 @@ app.connect('127.0.0.1', 7497, 123)
 api_thread = threading.Thread(target=run_loop, daemon=True)
 api_thread.start()
 
-time.sleep(1)  # Sleep interval to allow time for connection to server
+time.sleep(2)  # Sleep interval to allow time for connection to server
 
 # Create contract object
-eurusd_contract = Contract()
-eurusd_contract.symbol = 'EUR'
-eurusd_contract.secType = 'CASH'
-eurusd_contract.exchange = 'IDEALPRO'
-eurusd_contract.currency = 'USD'
+ES_futures__contract = Contract()
+ES_futures__contract.symbol = 'ES'
+ES_futures__contract.secType = 'FUT'
+ES_futures__contract.exchange = 'GLOBEX'
+ES_futures__contract.lastTradeDateOrContractMonth  = '20221216'
 
 # Request historical candles
-app.reqHistoricalData(1, eurusd_contract, '', '2 D', '1 hour', 'BID', 0, 2, False, [])
+#after mid (data type), 0 for only regular trading hours data and 1 for outside RTH
+app.reqHistoricalData(1, ES_futures__contract, '', '1 D', '1 min', 'MIDPOINT', 1, 2, False, [])
 
 time.sleep(5)  # sleep to allow enough time for data to be returned
+
+#Working with Pandas DataFrames
+import pandas
+
+df = pandas.DataFrame(app.data, columns=['DateTime', 'Close'])
+df['DateTime'] = pandas.to_datetime(df['DateTime'],unit='s')
+df.to_csv('ES_futures_data.csv')
+print('complete')
+print(df)
+
+
 app.disconnect()
