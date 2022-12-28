@@ -39,12 +39,12 @@ def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
 
 
 def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
-    global ani, start_run_time
+    global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
     ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
 
     if not prog_queue.empty():
         pgr_epoch, pgr_batch = prog_queue.get()
-        ax_progress.clear()
+        #ax_progress.clear()
         ax_progress.axis('off')
 
         size = 0.05
@@ -54,7 +54,11 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
         vals = np.cumsum(np.append((90 / 360) * 2 * np.pi, vals_rad[:-1]))
         # vals = np.radians([90,86.4,82.8,79.2,75.6,72,68.4,64.8,61.2,57.6])
         # vals_rad = np.radians([3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6])
-        ax_progress.bar(x=vals,
+        try:
+            epoch_bars.remove()
+        except:
+            pass
+        epoch_bars = ax_progress.bar(x=vals,
                         width=vals_rad, bottom=0.65 - 2 * size, height=size,
                         edgecolor='w', color='#ffb600', linewidth=0, align="edge")
         angle = progress_angle
@@ -67,12 +71,31 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
         vals = np.cumsum(np.append((90 / 360) * 2 * np.pi, vals_rad[:-1]))
         # vals = np.radians([90,86.4,82.8,79.2,75.6,72,68.4,64.8,61.2,57.6])
         # vals_rad = np.radians([3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6])
-        ax_progress.bar(x=vals,
+        try:
+            batch_bars.remove()
+        except:
+            pass
+        batch_bars = ax_progress.bar(x=vals,
                         width=vals_rad, bottom=0.8 - 2 * size, height=size,
                         edgecolor='orange', color='orange', linewidth=0.5, align="edge")
         angle = progress_angle
         #ax_progress.text((-(angle - 90) / 360) * 2 * np.pi, 0.1, 'Batch', fontsize=9, color='orange', ha='center', va='bottom', rotation=-(angle - 90))
-        ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(round(time.time() - start_run_time, 0))) + 's')
+        seconds = round(time.time() - start_run_time, 0)
+        seconds = seconds % (24 * 3600)
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        try:
+            current_time_text.remove()
+        except:
+            pass
+        if hour != 0:
+            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+        elif minutes != 0:
+            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+        else:
+            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's')
 
     if not disp_queue.empty():
         rmse, target, prediction, error, batch_time_list = disp_queue.get()
@@ -114,8 +137,22 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
 
         ax_rmse.set_ylabel('RMSE')
         # ax_error.set_ylabel('Total Error')
-
-        ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(round(np.mean(batch_time_list)))) + 's')
+        seconds = round(np.mean(batch_time_list))
+        seconds = seconds % (24 * 3600)
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        try:
+            batch_time_text.remove()
+        except:
+            pass
+        if hour != 0:
+            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+        elif minutes != 0:
+            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+        else:
+            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(seconds)) + 's')
 
     ani.pause()
 
