@@ -30,15 +30,17 @@ line_list = []
 ani = None
 
 
-def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
+def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
+    last_tim = time.time()
     while 1:
-        if not prog_queue.empty() or not disp_queue.empty():
+        interval = time.time() - last_tim
+        if not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval >= 1:
+            last_tim = time.time()
             ani.resume()
-            while not prog_queue.empty() or not disp_queue.empty():
-                pass
+            while not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval <= 1:
+                interval = time.time() - last_tim
 
-
-def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
+def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
     global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
     ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
 
@@ -80,22 +82,6 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
                         edgecolor='orange', color='orange', linewidth=0.5, align="edge")
         angle = progress_angle
         #ax_progress.text((-(angle - 90) / 360) * 2 * np.pi, 0.1, 'Batch', fontsize=9, color='orange', ha='center', va='bottom', rotation=-(angle - 90))
-        seconds = round(time.time() - start_run_time, 0)
-        seconds = seconds % (24 * 3600)
-        hour = seconds // 3600
-        seconds %= 3600
-        minutes = seconds // 60
-        seconds %= 60
-        try:
-            current_time_text.remove()
-        except:
-            pass
-        if hour != 0:
-            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
-        elif minutes != 0:
-            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
-        else:
-            current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's')
 
     if not disp_queue.empty():
         rmse, target, prediction, error, batch_time_list = disp_queue.get()
@@ -137,6 +123,9 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
 
         ax_rmse.set_ylabel('RMSE')
         # ax_error.set_ylabel('Total Error')
+
+    if not tim_queue.empty():
+        batch_time_list = tim_queue.get()
         seconds = round(np.mean(batch_time_list))
         seconds = seconds % (24 * 3600)
         hour = seconds // 3600
@@ -148,11 +137,35 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, ax):
         except:
             pass
         if hour != 0:
-            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+            batch_time_text = ax_progress.text(np.radians(45), 1,
+                                               'Avg. Batch:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(
+                                                   int(seconds)) + 's')
         elif minutes != 0:
-            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+            batch_time_text = ax_progress.text(np.radians(45), 1,
+                                               'Avg. Batch:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
         else:
             batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(seconds)) + 's')
+        print("Batch Time Update")
+
+    seconds = round(time.time() - start_run_time, 0)
+    seconds = seconds % (24 * 3600)
+    hour = seconds // 3600
+    seconds %= 3600
+    minutes = seconds // 60
+    seconds %= 60
+    try:
+        current_time_text.remove()
+    except:
+        pass
+    if hour != 0:
+        current_time_text = ax_progress.text(np.radians(135), 1,
+                                             'Run Time:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(
+                                                 int(seconds)) + 's')
+    elif minutes != 0:
+        current_time_text = ax_progress.text(np.radians(135), 1,
+                                             'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+    else:
+        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's')
 
     ani.pause()
 
@@ -164,11 +177,12 @@ if __name__ == '__main__':
 
     display_queue = mp.Queue()
     progress_queue = mp.Queue()
+    time_queue = mp.Queue()
     e = mp.Event()
 
     match run_mode:
         case 'train':
-            gan_thread = mp.Process(target=gan.train, args=(display_queue, progress_queue), daemon=True)
+            gan_thread = mp.Process(target=gan.train, args=(display_queue, progress_queue, time_queue), daemon=True)
             gan_thread.start()
             start_run_time = time.time()
 
@@ -196,10 +210,10 @@ if __name__ == '__main__':
                     pass
 
 
-            update_thread = threading.Thread(target=scan, args=(display_queue, progress_queue, axs), daemon=True)
+            update_thread = threading.Thread(target=scan, args=(display_queue, progress_queue, time_queue, axs), daemon=True)
             update_thread.start()
 
-            ani = animation.FuncAnimation(fig, update, fargs=(display_queue, progress_queue, axs))
+            ani = animation.FuncAnimation(fig, update, fargs=(display_queue, progress_queue, time_queue, axs))
             plt.show()
 
         case 'run':

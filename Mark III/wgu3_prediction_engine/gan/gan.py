@@ -124,7 +124,7 @@ def data_preprocessing(stock_data):
 training_shift = None
 
 
-def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
+def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
     global training_shift
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
@@ -179,6 +179,7 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue):
                 model.save('optimal_model3')
             batch_time = end_time-start_time
             batch_time_list.append(batch_time)
+            tim_queue.put(batch_time_list)
             disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
             print(rmse_list)
 
