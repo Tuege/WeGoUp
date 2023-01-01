@@ -9,18 +9,14 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added run method for testing">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_12_2022_14_13_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_12_2022_14_13__Changes_.xml" beforeDir="false" />
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="UI improvements">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-1.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-1.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-2.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-2.index" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/keras_metadata.pb" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/keras_metadata.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/saved_model.pb" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/saved_model.pb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.data-00000-of-00001" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.index" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.index" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />

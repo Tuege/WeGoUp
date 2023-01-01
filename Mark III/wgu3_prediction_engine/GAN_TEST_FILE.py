@@ -29,6 +29,46 @@ prediction_list = []
 line_list = []
 ani = None
 
+def onclick(event, ax):
+    '''
+    Event handler for button_press_event
+    @param event MouseEvent
+    '''
+    global ix
+    ix = event.xdata
+
+    ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
+
+    for i, a in enumerate(ax):
+
+        # For information, print which axes the click was in
+        if ax == event.inaxes:
+            print("Click is in axes ax{}".format(i+1))
+
+    # Check if the click was in ax4 or ax5
+    if event.inaxes in [ax4, ax5]:
+
+        if ix is not None:
+            print 'x = %f' %(ix)
+
+        ax4.clear()
+        ax5.clear()
+        ax4.grid(True)
+        ax5.grid(True)
+        [n4,bins4,patches] = ax4.hist(x01, bins=50, color = 'red',alpha = 0.5, normed = True)
+        ax4.axvline(np.mean(x01), color = 'black', linestyle = 'dashed', lw = 2)
+        xmin = ix
+        xmax = ax4.get_xlim()[1]
+        ax4.axvspan(xmin, xmax, facecolor='0.9', alpha=0.5)
+        dx = bins4[1] - bins4[0]
+        CDF = np.cumsum(n4)*dx
+        ax5.plot(bins4[1:], CDF, color = 'red')
+        ax5.axvspan(xmin, xmax, facecolor='0.9', alpha=0.5)
+        plt.draw()
+        return ix
+
+    else:
+        return
 
 def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
     last_tim = time.time()
@@ -37,7 +77,7 @@ def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
         if not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval >= 1:
             last_tim = time.time()
             ani.resume()
-            while not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval <= 1:
+            while not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval > 1:
                 interval = time.time() - last_tim
 
 def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
@@ -54,8 +94,6 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
         vals_rad = np.empty(int(pgr_epoch[0] / pgr_epoch[2]))
         vals_rad.fill(np.radians(-(pgr_epoch[2] / pgr_epoch[1]) * 360))
         vals = np.cumsum(np.append((90 / 360) * 2 * np.pi, vals_rad[:-1]))
-        # vals = np.radians([90,86.4,82.8,79.2,75.6,72,68.4,64.8,61.2,57.6])
-        # vals_rad = np.radians([3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6,3.6])
         try:
             epoch_bars.remove()
         except:
@@ -126,7 +164,7 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
 
     if not tim_queue.empty():
         batch_time_list = tim_queue.get()
-        seconds = round(np.mean(batch_time_list))
+        seconds = np.mean(batch_time_list)
         seconds = seconds % (24 * 3600)
         hour = seconds // 3600
         seconds %= 3600
@@ -139,12 +177,12 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
         if hour != 0:
             batch_time_text = ax_progress.text(np.radians(45), 1,
                                                'Avg. Batch:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(
-                                                   int(seconds)) + 's')
+                                                   round(seconds,1)) + 's', ha='right', color='#747a80', size=9)
         elif minutes != 0:
             batch_time_text = ax_progress.text(np.radians(45), 1,
-                                               'Avg. Batch:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+                                               'Avg. Batch:\n' + str(int(minutes)) + 'm ' + str(round(seconds,1)) + 's', ha= 'right', color='#747a80', size=9)
         else:
-            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(int(seconds)) + 's')
+            batch_time_text = ax_progress.text(np.radians(45), 1, 'Avg. Batch:\n' + str(round(seconds,1)) + 's', ha='right', color='#747a80', size=9)
         print("Batch Time Update")
 
     seconds = round(time.time() - start_run_time, 0)
@@ -160,12 +198,12 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
     if hour != 0:
         current_time_text = ax_progress.text(np.radians(135), 1,
                                              'Run Time:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(
-                                                 int(seconds)) + 's')
+                                                 int(seconds)) + 's', color='#747a80', size=9)
     elif minutes != 0:
         current_time_text = ax_progress.text(np.radians(135), 1,
-                                             'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's')
+                                             'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's', color='#747a80', size=9)
     else:
-        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's')
+        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)
 
     ani.pause()
 
@@ -195,7 +233,9 @@ if __name__ == '__main__':
             axs.append(fig.add_subplot(gs[0, 1], projection='polar'))
             axs.append(fig.add_subplot(gs[1, :]))
 
-            match 'None':
+            cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, axs))
+
+            match 'beautify':
                 case 'beautify':
                     fig.set_facecolor('#2b2b2b')
                     for n in axs:
