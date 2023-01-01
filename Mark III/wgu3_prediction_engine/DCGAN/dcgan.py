@@ -1,3 +1,6 @@
+
+
+
 def train():
     # ------------------------------------------------------------------------------------------------------------
     # region 0. SETUP
@@ -141,7 +144,6 @@ def train():
     # You will reuse this seed overtime (so it's easier)
     # to visualize progress in the animated GIF
     seed = tf.random.normal([num_examples_to_generate, noise_dim])
-    losses_list = [[], []]
     # endregion
 
     # Notice the use of `tf.function`
