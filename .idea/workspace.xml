@@ -9,11 +9,10 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="UI improvements">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="begun adding log click event">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/keras_metadata.pb" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/keras_metadata.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/saved_model.pb" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/saved_model.pb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.data-00000-of-00001" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.data-00000-of-00001" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.index" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/optimal_model3/variables/variables.index" afterDir="false" />
@@ -48,18 +47,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;P:/Downloads/DCGAN/GAN breakdown.md&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "TODO_SCOPE": "All Places",
+    "WebServerToolWindowFactoryState": "false",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "last_opened_file_path": "P:/Downloads/DCGAN/GAN breakdown.md",
+    "settings.editor.selected.configurable": "com.lilittlecat.chatgpt.setting.ChatGPTSettingsConfigurable"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\Tüge\PycharmProjects\WeGoUp\Mark III\wgu3_prediction_engine" />
@@ -160,7 +159,14 @@
       <option name="project" value="LOCAL" />
       <updated>1671068677868</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="begun adding log click event">
+      <created>1672603254636</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1672603254636</updated>
+    </task>
+    <option name="localTasksCounter" value="11" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -204,7 +210,8 @@
     <MESSAGE value="working first prototype of LSTM with 6 features. no batches and only partial dataset" />
     <MESSAGE value="added live visualisation and fixed rmse bug" />
     <MESSAGE value="added run method for testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="added run method for testing" />
+    <MESSAGE value="begun adding log click event" />
+    <option name="LAST_COMMIT_MESSAGE" value="begun adding log click event" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

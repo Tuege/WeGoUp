@@ -36,8 +36,9 @@ def onclick(event, ax):
     '''
     global ix
     ix = event.xdata
+    iy = event.ydata
 
-    ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
+    ax_rmse, ax_progress, ax_prediction = ax[:]
 
     for i, a in enumerate(ax):
 
@@ -46,26 +47,18 @@ def onclick(event, ax):
             print("Click is in axes ax{}".format(i+1))
 
     # Check if the click was in ax4 or ax5
-    if event.inaxes in [ax4, ax5]:
+    if event.inaxes is ax_rmse:
 
         if ix is not None:
-            print 'x = %f' %(ix)
+            print('x = %f' %(ix))
+            print('y = %f' %(iy))
 
-        ax4.clear()
-        ax5.clear()
-        ax4.grid(True)
-        ax5.grid(True)
-        [n4,bins4,patches] = ax4.hist(x01, bins=50, color = 'red',alpha = 0.5, normed = True)
-        ax4.axvline(np.mean(x01), color = 'black', linestyle = 'dashed', lw = 2)
-        xmin = ix
-        xmax = ax4.get_xlim()[1]
-        ax4.axvspan(xmin, xmax, facecolor='0.9', alpha=0.5)
-        dx = bins4[1] - bins4[0]
-        CDF = np.cumsum(n4)*dx
-        ax5.plot(bins4[1:], CDF, color = 'red')
-        ax5.axvspan(xmin, xmax, facecolor='0.9', alpha=0.5)
-        plt.draw()
-        return ix
+        match ax_rmse.get_yscale():
+            case 'linear':
+                ax_rmse.set_yscale('log')
+            case 'log':
+                ax_rmse.set_yscale('linear')
+        return ix, iy
 
     else:
         return
@@ -82,7 +75,7 @@ def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
 
 def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
     global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
-    ax_rmse, ax_rmse_log, ax_progress, ax_prediction = ax[:]
+    ax_rmse, ax_progress, ax_prediction = ax[:]
 
     if not prog_queue.empty():
         pgr_epoch, pgr_batch = prog_queue.get()
@@ -125,19 +118,23 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
         rmse, target, prediction, error, batch_time_list = disp_queue.get()
         old_x_lim = ax_rmse.get_xlim()
         old_y_lim = ax_rmse.get_ylim()
+        old_scale = ax_rmse.get_yscale()
         if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
             ax_rmse.clear()
             ax_rmse.set_xlim(old_x_lim)
             ax_rmse.set_ylim(old_y_lim)
         else:
             ax_rmse.clear()
+        match old_scale:
+            case 'linear':
+                ax_rmse.set_yscale('linear')
+            case 'log':
+                ax_rmse.set_yscale('log')
         ax_rmse.plot(rmse, color='#4a8fdd')
         #figure = plt.gcf()
         #toolbar = figure.canvas.toolbar
         #toolbar.update()
 
-        old_x_lim = ax_rmse_log.get_xlim()
-        old_y_lim = ax_rmse_log.get_ylim()
         """if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
             ax_rmse_log.clear()
             ax_rmse.set_xlim(old_x_lim)
@@ -229,7 +226,7 @@ if __name__ == '__main__':
 
             axs = []
             axs.append(fig.add_subplot(gs[0, 0]))
-            axs.append(axs[0].twinx())
+            # axs.append(axs[0].twinx())
             axs.append(fig.add_subplot(gs[0, 1], projection='polar'))
             axs.append(fig.add_subplot(gs[1, :]))
 
@@ -241,8 +238,7 @@ if __name__ == '__main__':
                     for n in axs:
                         n.set_facecolor('#3c3f41')
                         n.spines[:].set_color('#747a80')
-                        n.tick_params(axis='x', colors='#747a80')
-                        n.tick_params(axis='y', colors='#747a80')
+                        n.tick_params(axis='both', which='both', colors='#747a80', labelcolor='#747a80')
                         n.xaxis.label.set_color('#747a80')
                         n.yaxis.label.set_color('#747a80')
                         n.title.set_color('#747a80')
