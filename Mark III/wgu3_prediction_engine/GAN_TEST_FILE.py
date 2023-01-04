@@ -3,6 +3,7 @@ import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from matplotlib.gridspec import GridSpec
+import scipy.stats as stats
 import numpy as np
 from gan import gan
 import os
@@ -27,6 +28,7 @@ def run_gan():
 
 prediction_list = []
 line_list = []
+error_stats_list = []
 ani = None
 
 def onclick(event, ax):
@@ -38,7 +40,7 @@ def onclick(event, ax):
     ix = event.xdata
     iy = event.ydata
 
-    ax_rmse, ax_progress, ax_prediction = ax[:]
+    ax_rmse, ax_histogram, ax_progress, ax_prediction = ax[:]
 
     for i, a in enumerate(ax):
 
@@ -75,7 +77,7 @@ def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
 
 def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
     global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
-    ax_rmse, ax_progress, ax_prediction = ax[:]
+    ax_rmse, ax_histogram, ax_progress, ax_prediction = ax[:]
 
     if not prog_queue.empty():
         pgr_epoch, pgr_batch = prog_queue.get()
@@ -159,6 +161,22 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
         ax_rmse.set_ylabel('RMSE')
         # ax_error.set_ylabel('Total Error')
 
+        ax_histogram.clear()
+        diff = target-prediction
+        counts, bins = np.histogram(diff, bins='auto')
+        ax_histogram.hist(bins[:-1], bins, weights=counts*(5/len(prediction)))
+        mu = np.mean(diff)
+        sigma = np.std(diff)
+        error_stats_list.append([mu, sigma])
+        print(len(error_stats_list))
+        for n in range(len(error_stats_list)):
+            print((1/(len(error_stats_list)-n)))
+            mu, sigma = error_stats_list[n]
+            x = np.linspace(mu - 10 * sigma, mu + 10 * sigma, 100)
+            ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd', alpha=(1/(len(error_stats_list)-n)))
+
+
+
     if not tim_queue.empty():
         batch_time_list = tim_queue.get()
         seconds = np.mean(batch_time_list)
@@ -222,12 +240,13 @@ if __name__ == '__main__':
             start_run_time = time.time()
 
             fig = plt.figure(constrained_layout=True)
-            gs = GridSpec(2, 2, figure=fig)
+            gs = GridSpec(2, 3, figure=fig)
 
             axs = []
             axs.append(fig.add_subplot(gs[0, 0]))
             # axs.append(axs[0].twinx())
-            axs.append(fig.add_subplot(gs[0, 1], projection='polar'))
+            axs.append(fig.add_subplot(gs[0, 1]))
+            axs.append(fig.add_subplot(gs[0, 2], projection='polar'))
             axs.append(fig.add_subplot(gs[1, :]))
 
             cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, axs))

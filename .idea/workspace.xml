@@ -9,7 +9,7 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="begun adding log click event">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added log click event">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
@@ -166,7 +166,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672603254636</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="added log click event">
+      <created>1672843580159</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1672843580159</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -211,7 +218,8 @@
     <MESSAGE value="added live visualisation and fixed rmse bug" />
     <MESSAGE value="added run method for testing" />
     <MESSAGE value="begun adding log click event" />
-    <option name="LAST_COMMIT_MESSAGE" value="begun adding log click event" />
+    <MESSAGE value="added log click event" />
+    <option name="LAST_COMMIT_MESSAGE" value="added log click event" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
