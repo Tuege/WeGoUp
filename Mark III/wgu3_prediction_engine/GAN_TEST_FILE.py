@@ -176,7 +176,6 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
             ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd', alpha=(1/(len(error_stats_list)-n)))
 
 
-
     if not tim_queue.empty():
         batch_time_list = tim_queue.get()
         seconds = np.mean(batch_time_list)
