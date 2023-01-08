@@ -8,12 +8,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
+from keras import layers
 from stockstats import StockDataFrame
 from stockstats import wrap, unwrap
 import multiprocessing as mp
 import time
 import scipy.stats as stats
+import customModels as models
 
 
 def data_preprocessing(stock_data):
@@ -126,20 +127,49 @@ training_shift = None
 
 def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
     global training_shift
+
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
+    print(np.shape(stock_data))
 
-    def scheduler(epoch, lr):
+    # Create the discriminator
+    discriminator = models.DiscriminatorModel()
+
+    # Create the generator
+    latent_dim = 128
+    generator = models.GeneratorModel(latent_dim=128)
+
+    class CustomCallbacks(keras.callbacks.Callback):
+        def on_epoch_end(self, epoch, logs=None):
+            prog_queue.put([[epoch+1, 5, 1], [training_shift+1, 200, 1]])
+
+    class GAN(keras.Model):
+        def __init__(self, generator, latent_dim):
+            super(GAN, self).__init__()
+            self.generator = generator
+            self.latent_dim = latent_dim
+
+        def compile(self, g_optimizer, loss_fn):
+            super(GAN, self).compile()
+            self.g_optimizer = g_optimizer
+            self.loss_fn = loss_fn
+
+        def train_step(self, data):
+            train_input, labels = data
+            with tf.GradientTape() as tape:
+                predictions = self.discriminator(train_input)
+                g_loss = self.loss_fn(labels, predictions)
+            grads = tape.gradient(g_loss, self.generator.trainable_weights)
+            self.g_optimizer.apply_gradients(zip(grads, self.generator.trainable_weights))
+            return {"g_loss": g_loss}
+
+    def scheduler(self, epoch, lr):
         if epoch < 1:
             return lr
         else:
             return lr * 1
             # print(lr * tf.math.exp(-0.1))
             # return lr * tf.math.exp(-0.1)
-
-    class CustomCallbacks(keras.callbacks.Callback):
-        def on_epoch_end(self, epoch, logs=None):
-            prog_queue.put([[epoch+1, 5, 1], [training_shift+1, 200, 1]])
 
     scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
 
@@ -150,7 +180,8 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
     x_train_original, y_train_original = x_train, y_train
 
     with tf.device('/GPU:0'):
-        model = keras.Sequential()
+        model = GAN(generator=generator, latent_dim=128)
+        """model = keras.Sequential()
         model.add(layers.LSTM(100, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2])))
         model.add(layers.LSTM(100, return_sequences=False))
         model.add(layers.Dense(25))
@@ -158,14 +189,14 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
         model.summary()
 
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
-
+"""
         for training_shift in range(0, 200, 1):
             start_time = time.time()
             x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
+
             model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[scheduler_callback, CustomCallbacks()])
 
             predictions = model.predict(x_test, verbose=False)
-
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
             target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
             rmse = np.sqrt(np.mean(predictions - target) ** 2)
@@ -174,8 +205,9 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
             rmse_list.append(rmse)
             error_list.append(error)
             end_time = time.time()
+
+            # Save model if it's good
             if (error == min(error_list)) and (rmse < 1):
-                print(training_shift)
                 model.save('optimal_model3')
             batch_time = end_time-start_time
             batch_time_list.append(batch_time)

@@ -9,9 +9,11 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added histogram">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added ChatGPT Testbench">
+      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/__init__.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -176,7 +178,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672866883581</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="added ChatGPT Testbench">
+      <created>1672952776867</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1672952776867</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -223,7 +232,8 @@
     <MESSAGE value="begun adding log click event" />
     <MESSAGE value="added log click event" />
     <MESSAGE value="added histogram" />
-    <option name="LAST_COMMIT_MESSAGE" value="added histogram" />
+    <MESSAGE value="added ChatGPT Testbench" />
+    <option name="LAST_COMMIT_MESSAGE" value="added ChatGPT Testbench" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -237,6 +247,11 @@
           <url>file://P:/Downloads/DCGAN/dcgan.py</url>
           <line>135</line>
           <option name="timeStamp" value="20" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
+          <url>file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py</url>
+          <line>140</line>
+          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
