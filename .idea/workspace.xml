@@ -9,10 +9,11 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added ChatGPT Testbench">
-      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/__init__.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="broke while adding custom training loop">
+      <change beforePath="$PROJECT_DIR$/.idea/WeGoUp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/WeGoUp.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -53,8 +54,8 @@
     &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;P:/Downloads/DCGAN/GAN breakdown.md&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.lilittlecat.chatgpt.setting.ChatGPTSettingsConfigurable&quot;
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Tüge/PycharmProjects/WeGoUp/Mark III/wgu3_prediction_engine/gan/customModels&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -185,7 +186,14 @@
       <option name="project" value="LOCAL" />
       <updated>1672952776867</updated>
     </task>
-    <option name="localTasksCounter" value="14" />
+    <task id="LOCAL-00014" summary="broke while adding custom training loop">
+      <created>1673205508108</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1673205508108</updated>
+    </task>
+    <option name="localTasksCounter" value="15" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -233,7 +241,8 @@
     <MESSAGE value="added log click event" />
     <MESSAGE value="added histogram" />
     <MESSAGE value="added ChatGPT Testbench" />
-    <option name="LAST_COMMIT_MESSAGE" value="added ChatGPT Testbench" />
+    <MESSAGE value="broke while adding custom training loop" />
+    <option name="LAST_COMMIT_MESSAGE" value="broke while adding custom training loop" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
@@ -247,11 +256,6 @@
           <url>file://P:/Downloads/DCGAN/dcgan.py</url>
           <line>135</line>
           <option name="timeStamp" value="20" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" suspend="THREAD" type="python-line">
-          <url>file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py</url>
-          <line>140</line>
-          <option name="timeStamp" value="24" />
         </line-breakpoint>
       </breakpoints>
       <default-breakpoints>
