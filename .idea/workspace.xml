@@ -9,10 +9,8 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="broke while adding custom training loop">
-      <change beforePath="$PROJECT_DIR$/.idea/WeGoUp.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/WeGoUp.iml" afterDir="false" />
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="barebones training achieved again">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
@@ -193,7 +191,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673205508108</updated>
     </task>
-    <option name="localTasksCounter" value="15" />
+    <task id="LOCAL-00015" summary="barebones training achieved again">
+      <created>1673476645414</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1673476645414</updated>
+    </task>
+    <option name="localTasksCounter" value="16" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -242,7 +247,8 @@
     <MESSAGE value="added histogram" />
     <MESSAGE value="added ChatGPT Testbench" />
     <MESSAGE value="broke while adding custom training loop" />
-    <option name="LAST_COMMIT_MESSAGE" value="broke while adding custom training loop" />
+    <MESSAGE value="barebones training achieved again" />
+    <option name="LAST_COMMIT_MESSAGE" value="barebones training achieved again" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

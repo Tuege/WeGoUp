@@ -20,13 +20,24 @@ class DiscriminatorModel (keras.Sequential):
         super().__init__(n_layers, name)
 
 
-class GeneratorModel(keras.Sequential):
+class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
     def __init__(self, shape=None, **kwargs):
         super().__init__(name='generator', **kwargs)
         self.add(layers.LSTM(100, return_sequences=True, input_shape=shape))
         self.add(layers.LSTM(100, return_sequences=False))
         self.add(layers.Dense(25))
         self.add(layers.Dense(1))
+
+        callbacks = []
+        self.callbacks = keras.callbacks.CallbackList(
+            callbacks,
+            # add_history=True,
+            # add_progbar=verbose != 0,
+            model=self,
+            verbose=True,
+            epochs=5,
+            # steps=data_handler.inferred_steps,
+        )
 
         # self.queue = tf.queue.FIFOQueue()
 
@@ -51,22 +62,33 @@ class GeneratorModel(keras.Sequential):
     ):
         dataset = tf.data.Dataset.from_tensor_slices((x, y))
         loss_value = 0
+        logs = {}
+        if callbacks is not None:
+            self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=5,)
+        #for n in callbacks:
+        #    self.callbacks.append(n)
+
         # Training loop
         for epoch in range(epochs):
             start_time = time.time()
+            logs["epoch"] = epoch
+            self.callbacks.on_epoch_begin(epoch=epoch, logs=logs)
 
-            print(np.shape(x))
-            loss_value = self.train_step(x, y)
+            # loss_value = self.train_step(x, y)
 
-            """# Loop over the batches of the dataset
-            for step, (x_batch_train, y_batch_train) in enumerate(dataset):
+            # Loop over the batches of the dataset
+            # for step, (x_batch_train, y_batch_train) in enumerate(dataset):
+            for batch in range(0, 200, 1):
+                self.callbacks.on_batch_begin(batch, logs)
+                x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
                 # Compute a training step
-                # data = {'input_layer': x_batch, 'output_layer': y_batch}
-                print(np.shape(x_batch_train))
-                loss_value = self.train_step(x_batch_train, y_batch_train)"""
+                loss_value = self.train_step(x_batch_train, y_batch_train)
+                self.callbacks.on_batch_end(batch, logs)
 
             # Log the loss value
             print('Epoch {}: loss = {}'.format(epoch, loss_value))
+
+            self.callbacks.on_epoch_end(epoch, logs)
 
 
 class GanModel(keras.Sequential):

@@ -179,19 +179,23 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
                 # print(lr * tf.math.exp(-0.1))
                 # return lr * tf.math.exp(-0.1)
 
-        scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
-
         class CustomCallbacks(keras.callbacks.Callback):
             def on_epoch_end(self, epoch, logs=None):
-                pass
+                print("Epoch has ended")
                 # TODO: replace queues
                 #   prog_queue.put([[epoch + 1, 5, 1], [training_shift + 1, 200, 1]])
 
+            def on_batch_end(self, batch, logs=None):
+                print(batch)
+
+        scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
+        custom_callback = CustomCallbacks()
+
         for training_shift in range(0, 200, 1):
             start_time = time.time()
-            x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
+            # x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
 
-            model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[scheduler_callback, CustomCallbacks()])
+            model.fit(x_train, y_train, batch_size=100, epochs=5, callbacks=[scheduler_callback, custom_callback])
 
             predictions = model.predict(x_test, verbose=False)
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
