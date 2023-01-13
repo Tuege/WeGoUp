@@ -49,7 +49,10 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
         # train_acc_metric.update_state(y, predictions)
-        return loss_value
+        self.compiled_metrics.update_state(labels, predictions)
+        # return loss_value
+
+        return {m.name: m.result() for m in self.metrics}
 
     def fit(
         self,
@@ -60,33 +63,35 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         verbose="auto",
         callbacks=None,
     ):
-        dataset = tf.data.Dataset.from_tensor_slices((x, y))
+        # dataset = tf.data.Dataset.from_tensor_slices((x, y))
         loss_value = 0
         logs = {}
         if callbacks is not None:
-            self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=5,)
-        #for n in callbacks:
-        #    self.callbacks.append(n)
+            self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
+
+        print(np.shape(x))
 
         # Training loop
         for epoch in range(epochs):
             start_time = time.time()
+            self.reset_metrics()
             logs["epoch"] = epoch
-            self.callbacks.on_epoch_begin(epoch=epoch, logs=logs)
-
-            # loss_value = self.train_step(x, y)
+            self.callbacks.on_epoch_begin(epoch, logs)
 
             # Loop over the batches of the dataset
             # for step, (x_batch_train, y_batch_train) in enumerate(dataset):
-            for batch in range(0, 200, 1):
+            for batch in range(0, np.shape(x)[0]-(batch_size-1), 1):
                 self.callbacks.on_batch_begin(batch, logs)
                 x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
                 # Compute a training step
-                loss_value = self.train_step(x_batch_train, y_batch_train)
+                logs = self.train_step(x_batch_train, y_batch_train)
+                loss_value = logs['loss']
                 self.callbacks.on_batch_end(batch, logs)
 
             # Log the loss value
-            print('Epoch {}: loss = {}'.format(epoch, loss_value))
+            # print('Epoch {}: loss = {}'.format(epoch+1, loss_value))
+            for m in self.metrics:
+                print('    {}: {}'.format(m.name, m.result()))
 
             self.callbacks.on_epoch_end(epoch, logs)
 

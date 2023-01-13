@@ -9,7 +9,7 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="barebones training achieved again">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="currently implementing logs for callbacks">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
@@ -198,7 +198,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673476645414</updated>
     </task>
-    <option name="localTasksCounter" value="16" />
+    <task id="LOCAL-00016" summary="currently implementing logs for callbacks">
+      <created>1673564431005</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1673564431005</updated>
+    </task>
+    <option name="localTasksCounter" value="17" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -248,7 +255,8 @@
     <MESSAGE value="added ChatGPT Testbench" />
     <MESSAGE value="broke while adding custom training loop" />
     <MESSAGE value="barebones training achieved again" />
-    <option name="LAST_COMMIT_MESSAGE" value="barebones training achieved again" />
+    <MESSAGE value="currently implementing logs for callbacks" />
+    <option name="LAST_COMMIT_MESSAGE" value="currently implementing logs for callbacks" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

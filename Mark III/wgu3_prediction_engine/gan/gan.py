@@ -19,13 +19,13 @@ from customModels import customModels as models
 
 def data_preprocessing(stock_data):
     stock_data.columns = stock_data.columns.str.lower()
-    """
+
     stock_data = wrap(stock_data)
     # stock_data['macd']
     stock_data.init_all()
     stock_data = unwrap(stock_data)
     stock_data.dropna(inplace=True)
-    """
+
     """
                      Open       High        Low      Close  Adj Close     Volume
     Date                                                                        
@@ -121,12 +121,7 @@ def data_preprocessing(stock_data):
     return x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len
 
 
-training_shift = None
-
-
 def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
-    global training_shift
-
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
     print(np.shape(x_train))
@@ -158,6 +153,7 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
     predictions_list = []
     batch_time_list = []
     x_train_original, y_train_original = x_train, y_train
+    batch_size = 100
 
     with tf.device('/GPU:0'):
         #model = GAN(generator=generator, latent_dim=128)
@@ -169,9 +165,9 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
         model = models.GeneratorModel(shape=(x_train.shape[1], x_train.shape[2]))
         model.summary()
 
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error', metrics=["accuracy", ])
 
-        def scheduler(self, epoch, lr):
+        def scheduler(epoch, lr):
             if epoch < 1:
                 return lr
             else:
@@ -181,21 +177,24 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
 
         class CustomCallbacks(keras.callbacks.Callback):
             def on_epoch_end(self, epoch, logs=None):
-                print("Epoch has ended")
+                pass
+                # print("Epoch has ended")
                 # TODO: replace queues
                 #   prog_queue.put([[epoch + 1, 5, 1], [training_shift + 1, 200, 1]])
 
             def on_batch_end(self, batch, logs=None):
-                print(batch)
+                pass
+                # print('batch', batch+1, ' out of ', batch_size)
 
-        scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
+        scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler, verbose=True)
         custom_callback = CustomCallbacks()
 
-        for training_shift in range(0, 200, 1):
+        # for training_shift in range(0, 200, 1):
+        if True:
             start_time = time.time()
             # x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
 
-            model.fit(x_train, y_train, batch_size=100, epochs=5, callbacks=[scheduler_callback, custom_callback])
+            model.fit(x_train, y_train, batch_size=batch_size, epochs=25, callbacks=[custom_callback, scheduler_callback])
 
             predictions = model.predict(x_test, verbose=False)
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
