@@ -117,7 +117,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         def on_epoch_end(self, epoch, logs=None):
             pass
             # print("Epoch has ended")
-            # TODO: replace queues
 
         def on_batch_end(self, batch, logs=None):
             pass
