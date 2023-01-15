@@ -10,17 +10,18 @@ import os
 import sys
 import time
 import importlib
+import tensorflow as tf
 
 #from DCGAN import dcgan as gan
 import DCGAN
 
 
-def train_gan(disp_queue: mp.Queue):
+def train_gan(queues):
     """gan.trainer(params)
     gan.optimiser(params)
     gan.hyperparameter_optimiser(params)
     gan.train(dataset, hyperparameter_optimisation=True)"""
-    gan.train(disp_queue)
+    gan.train(queues["display_queue"])
 
 def run_gan():
     gan.run()
@@ -65,22 +66,22 @@ def onclick(event, ax):
     else:
         return
 
-def scan(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
+def scan(queues, ax):
     last_tim = time.time()
     while 1:
         interval = time.time() - last_tim
-        if not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval >= 1:
+        if not queues["batch_prog_queue"].empty() or not queues["display_queue"].empty() or not queues["time_queue"].empty() or interval >= 1:
             last_tim = time.time()
             ani.resume()
-            while not prog_queue.empty() or not disp_queue.empty() or not tim_queue.empty() or interval > 1:
+            while not queues["batch_prog_queue"].empty() or not queues["display_queue"].empty() or not queues["time_queue"].empty() or interval > 1:
                 interval = time.time() - last_tim
 
-def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue, ax):
+def update(frame, queues, ax):
     global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
     ax_rmse, ax_histogram, ax_progress, ax_prediction = ax[:]
 
-    if not prog_queue.empty():
-        pgr_epoch, pgr_batch = prog_queue.get()
+    if not queues["batch_prog_queue"].empty():
+        pgr_epoch, pgr_batch = queues["batch_prog_queue"].get()
         #ax_progress.clear()
         ax_progress.axis('off')
 
@@ -116,8 +117,8 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
         angle = progress_angle
         #ax_progress.text((-(angle - 90) / 360) * 2 * np.pi, 0.1, 'Batch', fontsize=9, color='orange', ha='center', va='bottom', rotation=-(angle - 90))
 
-    if not disp_queue.empty():
-        rmse, target, prediction, error, batch_time_list = disp_queue.get()
+    if not queues["display_queue"].empty():
+        rmse, target, prediction, error, batch_time_list = queues["display_queue"].get()
         old_x_lim = ax_rmse.get_xlim()
         old_y_lim = ax_rmse.get_ylim()
         old_scale = ax_rmse.get_yscale()
@@ -176,8 +177,8 @@ def update(frame, disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queu
             ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd', alpha=(1/(len(error_stats_list)-n)))
 
 
-    if not tim_queue.empty():
-        batch_time_list = tim_queue.get()
+    if not queues["time_queue"].empty():
+        batch_time_list = queues["time_queue"].get()
         seconds = np.mean(batch_time_list)
         seconds = seconds % (24 * 3600)
         hour = seconds // 3600
@@ -227,14 +228,21 @@ if __name__ == '__main__':
     mp.freeze_support()
     run_mode = 'train'
 
+    # Setup queues for inter-process communications
     display_queue = mp.Queue()
     progress_queue = mp.Queue()
     time_queue = mp.Queue()
+    queues = {
+        'batch_prog_queue': progress_queue,
+        'display_queue': display_queue,
+        'time_queue': time_queue,
+    }
+
     e = mp.Event()
 
     match run_mode:
         case 'train':
-            gan_thread = mp.Process(target=gan.train, args=(display_queue, progress_queue, time_queue), daemon=True)
+            gan_thread = mp.Process(target=gan.train, args=(queues,), daemon=True)
             gan_thread.start()
             start_run_time = time.time()
 
@@ -264,10 +272,10 @@ if __name__ == '__main__':
                     pass
 
 
-            update_thread = threading.Thread(target=scan, args=(display_queue, progress_queue, time_queue, axs), daemon=True)
+            update_thread = threading.Thread(target=scan, args=(queues, axs), daemon=True)
             update_thread.start()
 
-            ani = animation.FuncAnimation(fig, update, fargs=(display_queue, progress_queue, time_queue, axs))
+            ani = animation.FuncAnimation(fig, update, fargs=(queues, axs))
             plt.show()
 
         case 'run':

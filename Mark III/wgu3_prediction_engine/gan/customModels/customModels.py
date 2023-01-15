@@ -39,7 +39,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             # steps=data_handler.inferred_steps,
         )
 
-        # self.queue = tf.queue.FIFOQueue()
+        self.queues = {}
 
     @tf.function
     def train_step(self, inputs, labels):
@@ -64,10 +64,10 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         callbacks=None,
     ):
         # dataset = tf.data.Dataset.from_tensor_slices((x, y))
-        loss_value = 0
         logs = {}
-        if callbacks is not None:
-            self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
+        # if callbacks is not None:
+        self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
+        self.stop_training = False
 
         print(np.shape(x))
 
@@ -75,7 +75,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         for epoch in range(epochs):
             start_time = time.time()
             self.reset_metrics()
-            logs["epoch"] = epoch
             self.callbacks.on_epoch_begin(epoch, logs)
 
             # Loop over the batches of the dataset
@@ -85,8 +84,9 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
                 # Compute a training step
                 logs = self.train_step(x_batch_train, y_batch_train)
-                loss_value = logs['loss']
-                self.callbacks.on_batch_end(batch, logs)
+                self.callbacks.on_batch_end(batch=batch, logs=logs)
+                if self.stop_training:
+                    break
 
             # Log the loss value
             # print('Epoch {}: loss = {}'.format(epoch+1, loss_value))
@@ -94,11 +94,41 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 print('    {}: {}'.format(m.name, m.result()))
 
             self.callbacks.on_epoch_end(epoch, logs)
+            if self.stop_training:
+                break
+
+    class CustomScheduler(keras.callbacks.LearningRateScheduler):
+        def __init__(self):
+            super().__init__(schedule=self.scheduler, verbose=True)
+
+        def scheduler(self, epoch, lr):
+            if epoch < 1:
+                return lr
+            else:
+                return lr * 1
+                # print(lr * tf.math.exp(-0.1))
+                # return lr * tf.math.exp(-0.1)
+
+    class CustomCallbacks(keras.callbacks.Callback):
+        def __init__(self, queues=None):
+            super().__init__()
+            self.queues = queues
+
+        def on_epoch_end(self, epoch, logs=None):
+            pass
+            # print("Epoch has ended")
+            # TODO: replace queues
+
+        def on_batch_end(self, batch, logs=None):
+            pass
+            self.queues['batch_prog_queue'].put([[batch + 1, 5, 1], [batch + 1, 200, 1]])
+            # print('batch', batch+1)
 
 
 class GanModel(keras.Sequential):
     def __init__(self, **kwargs):
         super().__init__(self, **kwargs)
+
 
 
 
