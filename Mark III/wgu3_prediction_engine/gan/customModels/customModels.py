@@ -71,10 +71,31 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
 
         print(np.shape(x))
 
+        logs['epochs'] = epochs
+        logs['batches'] = batch_size
+        self.callbacks.on_train_begin(logs)
+        del logs['epochs']
+        del logs['batches']
+
+        # self.reset_metrics()
+        self.compiled_metrics.update_state(None, None)
+        for m in self.metrics:
+            if m.name == 'epoch':
+                m.update_epoch(0)
+            elif m.name == 'epochs':
+                m.update_epochs(epochs)
+            elif m.name == 'batches':
+                m.update_batches(np.shape(x)[0]-(batch_size-1))
+
         # Training loop
         for epoch in range(epochs):
             start_time = time.time()
             self.reset_metrics()
+            for m in self.metrics:
+                if m.name == 'epoch':
+                    m.update_epoch(epoch + 1)
+                if m.name == 'batch':
+                    m.update_batch(0)
             self.callbacks.on_epoch_begin(epoch, logs)
 
             # Loop over the batches of the dataset
@@ -84,6 +105,9 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
                 # Compute a training step
                 logs = self.train_step(x_batch_train, y_batch_train)
+                for m in self.metrics:
+                    if m.name == 'batch':
+                        m.update_batch(batch + 1)
                 self.callbacks.on_batch_end(batch=batch, logs=logs)
                 if self.stop_training:
                     break
@@ -97,6 +121,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             if self.stop_training:
                 break
 
+    """
     class CustomScheduler(keras.callbacks.LearningRateScheduler):
         def __init__(self):
             super().__init__(schedule=self.scheduler, verbose=True)
@@ -120,9 +145,119 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
 
         def on_batch_end(self, batch, logs=None):
             pass
-            self.queues['batch_prog_queue'].put([[batch + 1, 5, 1], [batch + 1, 200, 1]])
+            epoch, epochs = logs["epoch", "epochs"]
+            self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
             # print('batch', batch+1)
+    """
 
+    class CustomCallbacks:
+        class Scheduler(keras.callbacks.LearningRateScheduler):
+            def __init__(self):
+                super().__init__(schedule=self.scheduler, verbose=True)
+
+            def scheduler(self, epoch, lr):
+                if epoch < 1:
+                    return lr
+                else:
+                    return lr * 1
+                    # print(lr * tf.math.exp(-0.1))
+                    # return lr * tf.math.exp(-0.1)
+
+        class Progress(keras.callbacks.Callback):
+            def __init__(self, queues=None):
+                super().__init__()
+                self.queues = queues
+
+            def on_train_begin(self, logs=None):
+                self.queues['state_queue'].put({
+                    'loss': 0,
+                    'epoch': 0,
+                    'epochs': logs['epochs'],
+                    'batch': 0,
+                    'batches': logs['batches'],
+                })
+
+            def on_epoch_end(self, epoch, logs=None):
+                pass
+                # print("Epoch has ended")
+
+            def on_batch_begin(self, batch, logs=None):
+                state = self.queues['state_queue'].get()
+                state['batch'] = batch
+                self.queues['state_queue'].put(state)
+
+            def on_batch_end(self, batch, logs=None):
+                pass
+                # self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
+                # print('batch', batch+1)
+
+    class CustomMetrics:
+        class _CustomMetric(keras.metrics.Metric):
+            def __init__(self, name='metric', **kwargs):
+                super().__init__(name=name, **kwargs)
+                self.metric = 0
+
+            def result(self):
+                return self.metric
+
+            def reset_state(self):
+                self.metric = self.metric
+                # pass
+
+        class Epoch(_CustomMetric):
+            def __init__(self, name='epoch', **kwargs):
+                super().__init__(name=name, **kwargs)
+
+            def update_state(self, *args, **kwargs):
+                self.update_epoch()
+
+            def update_epoch(self, epoch=None):
+                if epoch is not None:
+                    self.metric = epoch
+
+        class Epochs(_CustomMetric):
+            def __init__(self, name='epochs', **kwargs):
+                super().__init__(name=name, **kwargs)
+
+            def update_state(self, *args, **kwargs):
+                self.update_epochs()
+
+            def update_epochs(self, epochs=None):
+                if epochs is not None:
+                    self.metric = epochs
+
+        class Loss(_CustomMetric):
+            def __init__(self, name='loss', **kwargs):
+                super().__init__(name=name, **kwargs)
+
+            def update_state(self, *args, **kwargs):
+                self.update_loss()
+
+            def update_loss(self, loss=None):
+                if loss is not None:
+                    self.metric = loss
+
+        class Batch(_CustomMetric):
+            def __init__(self, name='batch', **kwargs):
+                super().__init__(name=name, **kwargs)
+
+            def update_state(self, *args, **kwargs):
+                self.update_batch()
+
+            def update_batch(self, batch=None):
+                if batch is not None:
+                    self.metric = batch
+
+        class Batches(_CustomMetric):
+            def __init__(self, name='batches', **kwargs):
+                super().__init__(name=name, **kwargs)
+
+            def update_state(self, *args, **kwargs):
+                self.update_batches()
+
+            def update_batches(self, batches=None):
+                if batches is not None:
+                    self.metric = batches
 
 class GanModel(keras.Sequential):
     def __init__(self, **kwargs):

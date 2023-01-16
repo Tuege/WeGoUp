@@ -232,10 +232,12 @@ if __name__ == '__main__':
     display_queue = mp.Queue()
     progress_queue = mp.Queue()
     time_queue = mp.Queue()
+    state_queue = mp.Queue()
     queues = {
         'batch_prog_queue': progress_queue,
         'display_queue': display_queue,
         'time_queue': time_queue,
+        'state_queue': state_queue,
     }
 
     e = mp.Event()

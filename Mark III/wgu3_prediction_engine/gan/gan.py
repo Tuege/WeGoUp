@@ -163,18 +163,30 @@ def train(queues):
         model = models.GeneratorModel(shape=(x_train.shape[1], x_train.shape[2]))
         model.summary()
 
+        # Import the custom Metrics
+        progress_metrics = [
+            # model.CustomMetrics.Loss(),
+            model.CustomMetrics.Epoch(),
+            model.CustomMetrics.Epochs(),
+            model.CustomMetrics.Batch(),
+            model.CustomMetrics.Batches(),
+        ]
+
+        epoch_metric = model.CustomMetrics.Epoch()
+        epochs_metric = model.CustomMetrics.Epochs()
+
         # Compile Model
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error', metrics=["accuracy", ])
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error', metrics=progress_metrics)
 
         # Import the custom Callbacks
-        scheduler_callback = model.CustomScheduler()
-        custom_callback = model.CustomCallbacks(queues=queues)
+        scheduler_callback = model.CustomCallbacks.Scheduler()
+        progress_callbacks = model.CustomCallbacks.Progress(queues=queues)
 
         if True:
             start_time = time.time()
             # x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
 
-            model.fit(x_train, y_train, batch_size=batch_size, epochs=25, callbacks=[custom_callback, scheduler_callback])
+            model.fit(x_train, y_train, batch_size=batch_size, epochs=25, callbacks=[progress_callbacks, scheduler_callback])
 
             predictions = model.predict(x_test, verbose=False)
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
