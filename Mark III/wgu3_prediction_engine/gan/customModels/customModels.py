@@ -114,8 +114,8 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
 
             # Log the loss value
             # print('Epoch {}: loss = {}'.format(epoch+1, loss_value))
-            for m in self.metrics:
-                print('    {}: {}'.format(m.name, m.result()))
+            # for m in self.metrics:
+            #     print('    {}: {}'.format(m.name, m.result()))
 
             self.callbacks.on_epoch_end(epoch, logs)
             if self.stop_training:
@@ -176,18 +176,25 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                     'batch': 0,
                     'batches': logs['batches'],
                 })
+                self.queues['update_event'].set()
 
             def on_epoch_end(self, epoch, logs=None):
-                pass
+                state = self.queues['state_queue'].get()
+                state['epoch'] = epoch
+                state['loss'] = logs['loss']
+                self.queues['state_queue'].put(state)
+                self.queues['update_event'].set()
                 # print("Epoch has ended")
 
             def on_batch_begin(self, batch, logs=None):
-                state = self.queues['state_queue'].get()
-                state['batch'] = batch
-                self.queues['state_queue'].put(state)
+                pass
 
             def on_batch_end(self, batch, logs=None):
-                pass
+                state = self.queues['state_queue'].get()
+                state['batch'] = batch
+                state['loss'] = logs['loss']
+                self.queues['state_queue'].put(state)
+                self.queues['update_event'].set()
                 # self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
                 # print('batch', batch+1)
 

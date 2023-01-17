@@ -12,7 +12,7 @@ import time
 import importlib
 import tensorflow as tf
 
-#from DCGAN import dcgan as gan
+# from DCGAN import dcgan as gan
 import DCGAN
 
 
@@ -23,6 +23,7 @@ def train_gan(queues):
     gan.train(dataset, hyperparameter_optimisation=True)"""
     gan.train(queues["display_queue"])
 
+
 def run_gan():
     gan.run()
 
@@ -31,6 +32,7 @@ prediction_list = []
 line_list = []
 error_stats_list = []
 ani = None
+
 
 def onclick(event, ax):
     '''
@@ -66,6 +68,19 @@ def onclick(event, ax):
     else:
         return
 
+
+def print_logs(queues):
+    state = queues['state_queue'].get()
+    queues['state_queue'].put(state)
+    while True:
+        queues['update_event'].wait()
+        queues['update_event'].clear()
+        state = queues['state_queue'].get()
+        queues['state_queue'].put(state)
+        for key, value in state.items():
+            print('    ', key, ': ', value)
+
+
 def scan(queues, ax):
     last_tim = time.time()
     while 1:
@@ -75,6 +90,7 @@ def scan(queues, ax):
             ani.resume()
             while not queues["batch_prog_queue"].empty() or not queues["display_queue"].empty() or not queues["time_queue"].empty() or interval > 1:
                 interval = time.time() - last_tim
+
 
 def update(frame, queues, ax):
     global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
@@ -233,14 +249,16 @@ if __name__ == '__main__':
     progress_queue = mp.Queue()
     time_queue = mp.Queue()
     state_queue = mp.Queue()
+    update_event = mp.Event()
     queues = {
         'batch_prog_queue': progress_queue,
         'display_queue': display_queue,
         'time_queue': time_queue,
         'state_queue': state_queue,
+        'update_event': update_event,
     }
 
-    e = mp.Event()
+
 
     match run_mode:
         case 'train':
@@ -276,6 +294,9 @@ if __name__ == '__main__':
 
             update_thread = threading.Thread(target=scan, args=(queues, axs), daemon=True)
             update_thread.start()
+
+            print_logs_thread = threading.Thread(target=print_logs, args=(queues,), daemon=True)
+            print_logs_thread.start()
 
             ani = animation.FuncAnimation(fig, update, fargs=(queues, axs))
             plt.show()
