@@ -87,6 +87,41 @@ class GuiClass:
     def draw_event_callback(self, event):
         print("Draw Event Triggered!")
 
+    def onclick(self, event):
+        '''
+        Event handler for button_press_event
+        @param event MouseEvent
+        '''
+        global ix
+        ix = event.xdata
+        iy = event.ydata
+
+        ax = [self.ax]
+
+        for i, a in enumerate(ax):
+
+            # For information, print which axes the click was in
+            if a == event.inaxes:
+                print("Click is in axes ax{}".format(i + 1))
+
+        # Check if the click was in ax4 or ax5
+        if event.inaxes is a:
+
+            if ix is not None:
+                print('x = %f' % (ix))
+                print('y = %f' % (iy))
+
+            match a.get_yscale():
+                case 'linear':
+                    a.set_yscale('log')
+                case 'log':
+                    a.set_yscale('linear')
+            self.ani.resume()
+            return ix, iy
+
+        else:
+            return
+
     def start_gui(self):
         self.ani = animation.FuncAnimation(self.fig, self.update_function)
 
@@ -94,31 +129,25 @@ class GuiClass:
 
         # self.update_process.start()
         # cid = self.fig.canvas.mpl_connect('close_event', self.on_close)
+        # bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         # did = self.fig.canvas.mpl_connect('draw_event', self.draw_event_callback)
-
-        # timer = self.fig.canvas.new_timer(interval=1)
-        # timer.add_callback(self.update_function)
-        # timer.start()
-
-
-        # IDEA:
-        #  add animation
-        #  add scanner process that pauses/resumes animation
-        #  add to closing_event of figure the termination of the scanning process
-        #  .
-        #  problems: may close figure first before executing closing callback
 
         plt.text(0.35, 0.5, 'Close Me!', dict(size=30))
         plt.show()
 
     def scan(self):
         try:
+            bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
             while True:
                 while not self.queues['update_event'].is_set():
                     pass
                 self.queues['update_event'].clear()
                 self.counter += 1
                 self.ax.set_title(str(self.counter))
+                if self.queues['epoch_event']:
+                    self.ax.set_xlabel(str("Epoch " + str(queues['state_queue'].get()['epoch'])))
+                if self.queues['batch_event']:
+                    self.ax.set_ylabel(str("Batch " + str(queues['state_queue'].get()['batch'])))
                 while self.running:
                     pass
                 self.ani.resume()
@@ -126,12 +155,8 @@ class GuiClass:
             return
 
     def update_function(self, frame):
-        self.running = True
-        if self.queues['epoch_event']:
-            self.ax.set_xlabel(str("Epoch " + str(queues['state_queue'].get()['epoch'])))
-        if self.queues['batch_event']:
-            self.ax.set_ylabel(str("Batch " + str(queues['state_queue'].get()['batch'])))
-        self.running = False
+        # self.running = True
+        # self.running = False
         self.ani.pause()
 
 
