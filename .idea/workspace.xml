@@ -9,10 +9,12 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="queues not needed. got metrics to work">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="data feeding to the test_file, issues with the first 2 epochs not updating">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/ChatGPT_Testbench.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/ChatGPT_Testbench.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,6 +37,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" root0="SKIP_INSPECTION" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -53,7 +58,7 @@
     &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
     &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/Tüge/PycharmProjects/WeGoUp/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable&quot;
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.toDoOptions&quot;
   }
 }</component>
   <component name="RecentsManager">
@@ -233,7 +238,14 @@
       <option name="project" value="LOCAL" />
       <updated>1673912106866</updated>
     </task>
-    <option name="localTasksCounter" value="21" />
+    <task id="LOCAL-00021" summary="data feeding to the test_file, issues with the first 2 epochs not updating">
+      <created>1673999118901</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1673999118901</updated>
+    </task>
+    <option name="localTasksCounter" value="22" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -260,7 +272,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="added Mark I and II" />
     <MESSAGE value="added more modules" />
     <MESSAGE value="trying ways to auto reload modules" />
     <MESSAGE value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
@@ -285,7 +296,8 @@
     <MESSAGE value="callbacks and metrics working" />
     <MESSAGE value="queues re-implemented" />
     <MESSAGE value="queues not needed. got metrics to work" />
-    <option name="LAST_COMMIT_MESSAGE" value="queues not needed. got metrics to work" />
+    <MESSAGE value="data feeding to the test_file, issues with the first 2 epochs not updating" />
+    <option name="LAST_COMMIT_MESSAGE" value="data feeding to the test_file, issues with the first 2 epochs not updating" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

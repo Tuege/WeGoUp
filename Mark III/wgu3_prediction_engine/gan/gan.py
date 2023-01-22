@@ -172,9 +172,6 @@ def train(queues):
             model.CustomMetrics.Batches(),
         ]
 
-        epoch_metric = model.CustomMetrics.Epoch()
-        epochs_metric = model.CustomMetrics.Epochs()
-
         # Compile Model
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error', metrics=progress_metrics)
 

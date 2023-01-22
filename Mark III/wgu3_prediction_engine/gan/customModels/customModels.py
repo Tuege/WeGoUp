@@ -55,13 +55,26 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         return {m.name: m.result() for m in self.metrics}
 
     def fit(
-        self,
-        x=None,
-        y=None,
-        batch_size=None,
-        epochs=1,
-        verbose="auto",
-        callbacks=None,
+            self,
+            x=None,
+            y=None,
+            batch_size=None,
+            epochs=1,
+            verbose="auto",
+            callbacks=None,
+            validation_split=0.0,
+            validation_data=None,
+            shuffle=True,
+            class_weight=None,
+            sample_weight=None,
+            initial_epoch=0,
+            steps_per_epoch=None,
+            validation_steps=None,
+            validation_batch_size=None,
+            validation_freq=1,
+            max_queue_size=10,
+            workers=1,
+            use_multiprocessing=False,
     ):
         # dataset = tf.data.Dataset.from_tensor_slices((x, y))
         logs = {}
@@ -69,13 +82,9 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
         self.stop_training = False
 
-        print(np.shape(x))
+        print('Input shape: ', np.shape(x))
 
-        logs['epochs'] = epochs
-        logs['batches'] = batch_size
-        self.callbacks.on_train_begin(logs)
-        del logs['epochs']
-        del logs['batches']
+        print(self.built)
 
         # self.reset_metrics()
         self.compiled_metrics.update_state(None, None)
@@ -86,6 +95,10 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 m.update_epochs(epochs)
             elif m.name == 'batches':
                 m.update_batches(np.shape(x)[0]-(batch_size-1))
+
+        logs['epochs'] = epochs
+        logs['batches'] = np.shape(x)[0]-(batch_size-1)
+        self.callbacks.on_train_begin(logs)
 
         # Training loop
         for epoch in range(epochs):
@@ -121,39 +134,10 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             if self.stop_training:
                 break
 
-    """
-    class CustomScheduler(keras.callbacks.LearningRateScheduler):
-        def __init__(self):
-            super().__init__(schedule=self.scheduler, verbose=True)
-
-        def scheduler(self, epoch, lr):
-            if epoch < 1:
-                return lr
-            else:
-                return lr * 1
-                # print(lr * tf.math.exp(-0.1))
-                # return lr * tf.math.exp(-0.1)
-
-    class CustomCallbacks(keras.callbacks.Callback):
-        def __init__(self, queues=None):
-            super().__init__()
-            self.queues = queues
-
-        def on_epoch_end(self, epoch, logs=None):
-            pass
-            # print("Epoch has ended")
-
-        def on_batch_end(self, batch, logs=None):
-            pass
-            epoch, epochs = logs["epoch", "epochs"]
-            self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
-            # print('batch', batch+1)
-    """
-
     class CustomCallbacks:
         class Scheduler(keras.callbacks.LearningRateScheduler):
             def __init__(self):
-                super().__init__(schedule=self.scheduler, verbose=True)
+                super().__init__(schedule=self.scheduler, verbose=False)
 
             def scheduler(self, epoch, lr):
                 if epoch < 1:
@@ -177,24 +161,27 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                     'batches': logs['batches'],
                 })
                 self.queues['update_event'].set()
+                self
+                print('\n---Training Started---\n')
 
             def on_epoch_end(self, epoch, logs=None):
                 state = self.queues['state_queue'].get()
-                state['epoch'] = epoch
+                state['epoch'] = epoch + 1
                 state['loss'] = logs['loss']
                 self.queues['state_queue'].put(state)
                 self.queues['update_event'].set()
-                # print("Epoch has ended")
+                self.queues['epoch_event'].set()
 
             def on_batch_begin(self, batch, logs=None):
                 pass
 
             def on_batch_end(self, batch, logs=None):
                 state = self.queues['state_queue'].get()
-                state['batch'] = batch
+                state['batch'] = batch + 1
                 state['loss'] = logs['loss']
                 self.queues['state_queue'].put(state)
                 self.queues['update_event'].set()
+                self.queues['batch_event'].set()
                 # self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
                 # print('batch', batch+1)
 
@@ -266,6 +253,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 if batches is not None:
                     self.metric = batches
 
+
 class GanModel(keras.Sequential):
     def __init__(self, **kwargs):
         super().__init__(self, **kwargs)
@@ -278,28 +266,6 @@ class GanModel(keras.Sequential):
 
 
 
-"""def fit(
-        self,
-        x=None,
-        y=None,
-        batch_size=None,
-        epochs=1,
-        verbose="auto",
-        callbacks=None,
-        validation_split=0.0,
-        validation_data=None,
-        shuffle=True,
-        class_weight=None,
-        sample_weight=None,
-        initial_epoch=0,
-        steps_per_epoch=None,
-        validation_steps=None,
-        validation_batch_size=None,
-        validation_freq=1,
-        max_queue_size=10,
-        workers=1,
-        use_multiprocessing=False,
-    ):"""
 
 """model = keras.Sequential()
         model.add(layers.LSTM(100, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2])))

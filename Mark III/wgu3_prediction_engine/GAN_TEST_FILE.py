@@ -9,6 +9,7 @@ from gan import gan
 import os
 import sys
 import time
+from alive_progress import alive_bar
 import importlib
 import tensorflow as tf
 
@@ -32,6 +33,7 @@ prediction_list = []
 line_list = []
 error_stats_list = []
 ani = None
+ani_is_running = False
 
 
 def onclick(event, ax):
@@ -69,16 +71,56 @@ def onclick(event, ax):
         return
 
 
-def print_logs(queues):
-    state = queues['state_queue'].get()
-    queues['state_queue'].put(state)
-    while True:
+def print_logs(queues, fig):
+    # fig = plt.figure(fig)
+    gs = GridSpec(2, 3, figure=fig)
+
+    axs = []
+    axs.append(fig.add_subplot(gs[0, 0]))
+    axs.append(fig.add_subplot(gs[0, 1]))
+    axs.append(fig.add_subplot(gs[0, 2], projection='polar'))
+    axs.append(fig.add_subplot(gs[1, :]))
+
+    cid = fig.canvas.mpl_connect('button_press_event', lambda event: onclick(event, axs))
+
+    match 'beautify':
+        case 'beautify':
+            fig.set_facecolor('#2b2b2b')
+            for n in axs:
+                n.set_facecolor('#3c3f41')
+                n.spines[:].set_color('#747a80')
+                n.tick_params(axis='both', which='both', colors='#747a80', labelcolor='#747a80')
+                n.xaxis.label.set_color('#747a80')
+                n.yaxis.label.set_color('#747a80')
+                n.title.set_color('#747a80')
+        case _:
+            pass
+    # Get initial state
+    # queues['update_event'].wait()
+    # queues['update_event'].clear()
+    # state = queues['state_queue'].get()
+    # queues['state_queue'].put(state)
+    # for key, value in state.items():
+    #     print('    ', key, ': ', value)
+    # plt.ion()
+    # plt.show(block=False)
+
+    ax_rmse, ax_histogram, ax_progress, ax_prediction = axs[:]
+    #plt.ion()
+    #plt.show()
+
+    while plt.gcf() is not None:
         queues['update_event'].wait()
         queues['update_event'].clear()
-        state = queues['state_queue'].get()
-        queues['state_queue'].put(state)
-        for key, value in state.items():
-            print('    ', key, ': ', value)
+        ax_rmse.set_title('ABCD')
+        plt.draw()
+        print('Event Detected')
+
+        # state = queues['state_queue'].get()
+        # queues['state_queue'].put(state)
+        # for key, value in state.items():
+            # if key == 'batch':
+                # print('    ', key, ': ', value)
 
 
 def scan(queues, ax):
@@ -93,10 +135,26 @@ def scan(queues, ax):
 
 
 def update(frame, queues, ax):
-    global ani, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
+    global ani, ani_is_running, start_run_time, epoch_bars, batch_bars, current_time_text, batch_time_text
     ax_rmse, ax_histogram, ax_progress, ax_prediction = ax[:]
 
-    if not queues["batch_prog_queue"].empty():
+    ani_is_running = True
+
+    print('Animation Started')
+    state = queues['state_queue'].get()
+    queues['state_queue'].put(state)
+    print('Animation Continued')
+
+    if queues['epoch_event'].is_set():
+        queues['epoch_event'].clear()
+        print("Epoch display updated")
+
+    if queues['batch_event'].is_set():
+        ax_histogram.set_title(str(state['batch']))
+        queues['batch_event'].clear()
+        print("Batch display updated")
+
+    """if not queues["batch_prog_queue"].empty():
         pgr_epoch, pgr_batch = queues["batch_prog_queue"].get()
         #ax_progress.clear()
         ax_progress.axis('off')
@@ -154,14 +212,14 @@ def update(frame, queues, ax):
         #toolbar = figure.canvas.toolbar
         #toolbar.update()
 
-        """if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
+        """"""if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
             ax_rmse_log.clear()
             ax_rmse.set_xlim(old_x_lim)
             ax_rmse.set_ylim(old_y_lim)
         else:
             ax_rmse_log.clear()
         ax_rmse_log.plot(rmse, color='#4a8fdd')
-        ax_rmse_log.set_yscale('log')"""
+        ax_rmse_log.set_yscale('log')""""""
 
         # ax_error.clear()
         # ax_error.plot(error, color='#4a8fdd')
@@ -191,7 +249,6 @@ def update(frame, queues, ax):
             mu, sigma = error_stats_list[n]
             x = np.linspace(mu - 10 * sigma, mu + 10 * sigma, 100)
             ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd', alpha=(1/(len(error_stats_list)-n)))
-
 
     if not queues["time_queue"].empty():
         batch_time_list = queues["time_queue"].get()
@@ -234,8 +291,9 @@ def update(frame, queues, ax):
         current_time_text = ax_progress.text(np.radians(135), 1,
                                              'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's', color='#747a80', size=9)
     else:
-        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)
+        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)"""
 
+    ani_is_running = False
     ani.pause()
 
 
@@ -250,12 +308,17 @@ if __name__ == '__main__':
     time_queue = mp.Queue()
     state_queue = mp.Queue()
     update_event = mp.Event()
+    epoch_event = mp.Event()
+    batch_event = mp.Event()
+
     queues = {
         'batch_prog_queue': progress_queue,
         'display_queue': display_queue,
         'time_queue': time_queue,
         'state_queue': state_queue,
         'update_event': update_event,
+        'epoch_event': epoch_event,
+        'batch_event': batch_event,
     }
 
 
@@ -266,12 +329,13 @@ if __name__ == '__main__':
             gan_thread.start()
             start_run_time = time.time()
 
-            fig = plt.figure(constrained_layout=True)
+            fig = plt.figure("GUI", constrained_layout=True)
+
+            """fig = plt.figure("GUI", constrained_layout=True)
             gs = GridSpec(2, 3, figure=fig)
 
             axs = []
             axs.append(fig.add_subplot(gs[0, 0]))
-            # axs.append(axs[0].twinx())
             axs.append(fig.add_subplot(gs[0, 1]))
             axs.append(fig.add_subplot(gs[0, 2], projection='polar'))
             axs.append(fig.add_subplot(gs[1, :]))
@@ -289,16 +353,19 @@ if __name__ == '__main__':
                         n.yaxis.label.set_color('#747a80')
                         n.title.set_color('#747a80')
                 case _:
-                    pass
+                    pass"""
 
 
-            update_thread = threading.Thread(target=scan, args=(queues, axs), daemon=True)
-            update_thread.start()
+            # update_thread = threading.Thread(target=scan, args=(queues, axs), daemon=True)
+            # update_thread.start()
 
-            print_logs_thread = threading.Thread(target=print_logs, args=(queues,), daemon=True)
+            print_logs_thread = threading.Thread(target=print_logs, args=(queues, fig), daemon=True)
             print_logs_thread.start()
-
-            ani = animation.FuncAnimation(fig, update, fargs=(queues, axs))
+            # process = mp.Process(target=print_logs, args=(queues, fig), daemon=True)
+            # process.start()
+            # print_logs(queues, fig)
+            # process.join()
+            # ani = animation.FuncAnimation(fig, update, fargs=(queues, axs))
             plt.show()
 
         case 'run':
