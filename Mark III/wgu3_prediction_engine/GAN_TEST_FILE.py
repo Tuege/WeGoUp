@@ -6,6 +6,7 @@ from matplotlib.gridspec import GridSpec
 import scipy.stats as stats
 import numpy as np
 from gan import gan
+from gan.customModels import customModels
 import os
 import sys
 import time
@@ -154,10 +155,14 @@ def update(frame, queues, ax):
         queues['batch_event'].clear()
         print("Batch display updated")
 
-    """if not queues["batch_prog_queue"].empty():
+    if not queues["batch_prog_queue"].empty():
         pgr_epoch, pgr_batch = queues["batch_prog_queue"].get()
         #ax_progress.clear()
         ax_progress.axis('off')
+
+        # [0]: batch
+        # [1]: batches
+        # [2]: increment
 
         size = 0.05
         progress_angle = (pgr_epoch[0] / pgr_epoch[1]) * 360
@@ -208,18 +213,21 @@ def update(frame, queues, ax):
             case 'log':
                 ax_rmse.set_yscale('log')
         ax_rmse.plot(rmse, color='#4a8fdd')
+
+        ax_rmse.set_ylabel('RMSE')
+
         #figure = plt.gcf()
         #toolbar = figure.canvas.toolbar
         #toolbar.update()
 
-        """"""if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
+        """if len(rmse) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(rmse[:-1])-1)) or ((old_y_lim[0] > min(rmse[:-1])) or (old_y_lim[1] < max(rmse[:-1])))):
             ax_rmse_log.clear()
             ax_rmse.set_xlim(old_x_lim)
             ax_rmse.set_ylim(old_y_lim)
         else:
             ax_rmse_log.clear()
         ax_rmse_log.plot(rmse, color='#4a8fdd')
-        ax_rmse_log.set_yscale('log')""""""
+        ax_rmse_log.set_yscale('log')"""
 
         # ax_error.clear()
         # ax_error.plot(error, color='#4a8fdd')
@@ -233,7 +241,6 @@ def update(frame, queues, ax):
         ax_prediction.set_ylabel('Price ($)')
         ax_prediction.set_xlabel('Date')
 
-        ax_rmse.set_ylabel('RMSE')
         # ax_error.set_ylabel('Total Error')
 
         ax_histogram.clear()
@@ -291,7 +298,7 @@ def update(frame, queues, ax):
         current_time_text = ax_progress.text(np.radians(135), 1,
                                              'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's', color='#747a80', size=9)
     else:
-        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)"""
+        current_time_text = ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)
 
     ani_is_running = False
     ani.pause()
@@ -327,9 +334,13 @@ if __name__ == '__main__':
         case 'train':
             gan_thread = mp.Process(target=gan.train, args=(queues,), daemon=True)
             gan_thread.start()
-            start_run_time = time.time()
 
-            fig = plt.figure("GUI", constrained_layout=True)
+            gui = customModels.TrainingGui(queues)
+            # gui.start_gui()
+
+            # start_run_time = time.time()
+
+            # fig = plt.figure("GUI", constrained_layout=True)
 
             """fig = plt.figure("GUI", constrained_layout=True)
             gs = GridSpec(2, 3, figure=fig)
@@ -359,14 +370,14 @@ if __name__ == '__main__':
             # update_thread = threading.Thread(target=scan, args=(queues, axs), daemon=True)
             # update_thread.start()
 
-            print_logs_thread = threading.Thread(target=print_logs, args=(queues, fig), daemon=True)
-            print_logs_thread.start()
+            # print_logs_thread = threading.Thread(target=print_logs, args=(queues, fig), daemon=True)
+            # print_logs_thread.start()
             # process = mp.Process(target=print_logs, args=(queues, fig), daemon=True)
             # process.start()
             # print_logs(queues, fig)
             # process.join()
             # ani = animation.FuncAnimation(fig, update, fargs=(queues, axs))
-            plt.show()
+            # plt.show()
 
         case 'run':
             gan_thread = mp.Process(target=gan.run)

@@ -9,9 +9,12 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="new GUI framework on testbench">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="fixed unresponsive behavior">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/ChatGPT_Testbench.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/ChatGPT_Testbench.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -35,7 +38,7 @@
     <option name="RESET_MODE" value="HARD" />
   </component>
   <component name="HighlightingSettingsPerFile">
-    <setting file="file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" root0="SKIP_INSPECTION" />
+    <setting file="file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -249,7 +252,14 @@
       <option name="project" value="LOCAL" />
       <updated>1674394138641</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="fixed unresponsive behavior">
+      <created>1674400152289</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1674400152289</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -276,7 +286,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="trying ways to auto reload modules" />
     <MESSAGE value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
     <MESSAGE value="renaming main" />
     <MESSAGE value="." />
@@ -301,7 +310,8 @@
     <MESSAGE value="queues not needed. got metrics to work" />
     <MESSAGE value="data feeding to the test_file, issues with the first 2 epochs not updating" />
     <MESSAGE value="new GUI framework on testbench" />
-    <option name="LAST_COMMIT_MESSAGE" value="new GUI framework on testbench" />
+    <MESSAGE value="fixed unresponsive behavior" />
+    <option name="LAST_COMMIT_MESSAGE" value="fixed unresponsive behavior" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

@@ -126,28 +126,6 @@ def train(queues):
     x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
     print(np.shape(x_train))
 
-    """
-            class GAN(keras.Model):
-                def __init__(self, generator, latent_dim):
-                    super(GAN, self).__init__()
-                    self.generator = generator
-                    self.latent_dim = latent_dim
-
-                def compile(self, g_optimizer, loss_fn):
-                    super(GAN, self).compile()
-                    self.g_optimizer = g_optimizer
-                    self.loss_fn = loss_fn
-
-                def train_step(self, data):
-                    train_input, labels = data
-                    with tf.GradientTape() as tape:
-                        predictions = self.discriminator(train_input)
-                        g_loss = self.loss_fn(labels, predictions)
-                    grads = tape.gradient(g_loss, self.generator.trainable_weights)
-                    self.g_optimizer.apply_gradients(zip(grads, self.generator.trainable_weights))
-                    return {"g_loss": g_loss}
-        """
-
     rmse_list = []
     error_list = []
     predictions_list = []
@@ -184,6 +162,9 @@ def train(queues):
             # x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
 
             model.fit(x_train, y_train, batch_size=batch_size, epochs=25, callbacks=[progress_callbacks, scheduler_callback])
+
+            # gui_process = mp.Process(target=model.TrainingGui, args=(queues,))
+            # gui_process.start()
 
             predictions = model.predict(x_test, verbose=False)
             predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))

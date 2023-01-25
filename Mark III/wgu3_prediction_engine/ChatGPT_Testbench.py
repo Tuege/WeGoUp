@@ -7,6 +7,7 @@ import os
 
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.gridspec import GridSpec
 import numpy as np
 
 
@@ -68,14 +69,33 @@ class Scanner:
 
 class GuiClass:
     def __init__(self, queues):
-        # self.fig = plt.figure()
-        self.fig, self.ax = plt.subplots()
         self.queues = queues
 
-        # self.update_process = mp.Process(target=self.update_loop)
+        self.fig = plt.figure(constrained_layout=True)
+        gs = GridSpec(2, 3, figure=self.fig)
+
+        self.axs = []
+        self.axs.append(self.fig.add_subplot(gs[0, 0]))
+        self.axs.append(self.fig.add_subplot(gs[0, 1]))
+        self.axs.append(self.fig.add_subplot(gs[0, 2], projection='polar'))
+        self.axs.append(self.fig.add_subplot(gs[1, :]))
+
+        # cid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+
+        match 'beautify':
+            case 'beautify':
+                self.fig.set_facecolor('#2b2b2b')
+                for n in self.axs:
+                    n.set_facecolor('#3c3f41')
+                    n.spines[:].set_color('#747a80')
+                    n.tick_params(axis='both', which='both', colors='#747a80', labelcolor='#747a80')
+                    n.xaxis.label.set_color('#747a80')
+                    n.yaxis.label.set_color('#747a80')
+                    n.title.set_color('#747a80')
+            case _:
+                pass
+
         self.scan_thread = threading.Thread(target=self.scan)
-        self.counter = 0
-        self.running = False
 
     def on_close(self, event):
         # print('Closed Figure!')
@@ -88,34 +108,29 @@ class GuiClass:
         print("Draw Event Triggered!")
 
     def onclick(self, event):
-        '''
-        Event handler for button_press_event
-        @param event MouseEvent
-        '''
-        global ix
         ix = event.xdata
         iy = event.ydata
 
-        ax = [self.ax]
+        ax_rmse, ax_histogram, ax_progress, ax_prediction = self.axs[:]
 
-        for i, a in enumerate(ax):
+        for i, a in enumerate(self.axs):
 
             # For information, print which axes the click was in
             if a == event.inaxes:
                 print("Click is in axes ax{}".format(i + 1))
 
         # Check if the click was in ax4 or ax5
-        if event.inaxes is a:
+        if event.inaxes is ax_rmse:
 
             if ix is not None:
                 print('x = %f' % (ix))
                 print('y = %f' % (iy))
 
-            match a.get_yscale():
+            match ax_rmse.get_yscale():
                 case 'linear':
-                    a.set_yscale('log')
+                    ax_rmse.set_yscale('log')
                 case 'log':
-                    a.set_yscale('linear')
+                    ax_rmse.set_yscale('linear')
             self.ani.resume()
             return ix, iy
 
@@ -123,13 +138,12 @@ class GuiClass:
             return
 
     def start_gui(self):
-        self.ani = animation.FuncAnimation(self.fig, self.update_function)
+        self.ani = animation.FuncAnimation(self.fig, self.redraw)
 
         self.scan_thread.start()
 
-        # self.update_process.start()
         # cid = self.fig.canvas.mpl_connect('close_event', self.on_close)
-        # bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         # did = self.fig.canvas.mpl_connect('draw_event', self.draw_event_callback)
 
         plt.text(0.35, 0.5, 'Close Me!', dict(size=30))
@@ -137,26 +151,28 @@ class GuiClass:
 
     def scan(self):
         try:
-            bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
             while True:
-                while not self.queues['update_event'].is_set():
-                    pass
+                # while not self.queues['update_event'].is_set():
+                #     pass
+                self.queues['update_event'].wait()
                 self.queues['update_event'].clear()
-                self.counter += 1
-                self.ax.set_title(str(self.counter))
-                if self.queues['epoch_event']:
-                    self.ax.set_xlabel(str("Epoch " + str(queues['state_queue'].get()['epoch'])))
-                if self.queues['batch_event']:
-                    self.ax.set_ylabel(str("Batch " + str(queues['state_queue'].get()['batch'])))
-                while self.running:
-                    pass
+                self.update_function()
                 self.ani.resume()
         finally:
+            # This is required to automatically shutdown this thread when the figure is closed
             return
 
-    def update_function(self, frame):
-        # self.running = True
-        # self.running = False
+    def update_function(self):
+        ax_rmse, ax_histogram, ax_progress, ax_prediction = self.axs[:]
+
+        if self.queues['epoch_event']:
+            ax_rmse.set_xlabel(str("Epoch " + str(queues['state_queue'].get()['epoch'])))
+            queues['epoch_event'].clear()
+        if self.queues['batch_event']:
+            ax_rmse.set_ylabel(str("Batch " + str(queues['state_queue'].get()['batch'])))
+            queues['batch_event'].clear()
+
+    def redraw(self, frame):
         self.ani.pause()
 
 
@@ -164,7 +180,7 @@ def random_feeder(queues):
     epoch = 0
     batch = 0
     while True:
-        sleep_time = float(random.randint(1, 1000))/float(1000)
+        sleep_time = float(random.randint(1000, 10000))/float(1000)
         time.sleep(sleep_time)
         match random.randint(1, 2):
             case 1:

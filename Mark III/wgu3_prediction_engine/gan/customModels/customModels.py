@@ -1,8 +1,13 @@
 import tensorflow as tf
 from tensorflow import keras
 from keras import layers
+import sys
 import time
 import numpy as np
+import threading
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from matplotlib.gridspec import GridSpec
 
 
 class DiscriminatorModel (keras.Sequential):
@@ -84,8 +89,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
 
         print('Input shape: ', np.shape(x))
 
-        print(self.built)
-
         # self.reset_metrics()
         self.compiled_metrics.update_state(None, None)
         for m in self.metrics:
@@ -98,6 +101,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
 
         logs['epochs'] = epochs
         logs['batches'] = np.shape(x)[0]-(batch_size-1)
+        logs['target'] = y
         self.callbacks.on_train_begin(logs)
 
         # Training loop
@@ -118,6 +122,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
                 # Compute a training step
                 logs = self.train_step(x_batch_train, y_batch_train)
+
                 for m in self.metrics:
                     if m.name == 'batch':
                         m.update_batch(batch + 1)
@@ -130,6 +135,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             # for m in self.metrics:
             #     print('    {}: {}'.format(m.name, m.result()))
 
+            logs['prediction'] = self(x, training=False)
             self.callbacks.on_epoch_end(epoch, logs)
             if self.stop_training:
                 break
@@ -151,6 +157,8 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             def __init__(self, queues=None):
                 super().__init__()
                 self.queues = queues
+                self.epoch_start_time = 0
+                self.batch_start_time = 0
 
             def on_train_begin(self, logs=None):
                 self.queues['state_queue'].put({
@@ -159,26 +167,36 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                     'epochs': logs['epochs'],
                     'batch': 0,
                     'batches': logs['batches'],
+                    'start_time': time.time(),
+                    'epoch_time': 0,
+                    'batch_time': 0,
+                    'target': logs['target'],
+                    'prediction': [],
                 })
                 self.queues['update_event'].set()
-                self
                 print('\n---Training Started---\n')
+
+            def on_epoch_begin(self, epoch, logs=None):
+                self.epoch_start_time = time.time()
 
             def on_epoch_end(self, epoch, logs=None):
                 state = self.queues['state_queue'].get()
                 state['epoch'] = epoch + 1
                 state['loss'] = logs['loss']
+                state['epoch_time'] = time.time() - self.epoch_start_time
+                state['prediction'] = logs['prediction']
                 self.queues['state_queue'].put(state)
                 self.queues['update_event'].set()
                 self.queues['epoch_event'].set()
 
             def on_batch_begin(self, batch, logs=None):
-                pass
+                self.batch_start_time = time.time()
 
             def on_batch_end(self, batch, logs=None):
                 state = self.queues['state_queue'].get()
                 state['batch'] = batch + 1
                 state['loss'] = logs['loss']
+                state['batch_time'] = time.time() - self.batch_start_time
                 self.queues['state_queue'].put(state)
                 self.queues['update_event'].set()
                 self.queues['batch_event'].set()
@@ -258,6 +276,181 @@ class GanModel(keras.Sequential):
     def __init__(self, **kwargs):
         super().__init__(self, **kwargs)
 
+
+class TrainingGui:
+    def __init__(self, queues):
+        self.queues = queues
+        self.current_time_text = None
+        self.epoch_bar = None
+        self.batch_bar = None
+        self.prediction_list = []
+
+        self.fig = plt.figure(constrained_layout=True)
+        gs = GridSpec(2, 3, figure=self.fig)
+
+        self.axs = []
+        self.axs.append(self.fig.add_subplot(gs[0, 0]))
+        self.axs.append(self.fig.add_subplot(gs[0, 1]))
+        self.axs.append(self.fig.add_subplot(gs[0, 2], projection='polar'))
+        self.axs.append(self.fig.add_subplot(gs[1, :]))
+
+        self.ax_rmse, self.ax_histogram, self.ax_progress, self.ax_prediction = self.axs[:]
+
+        match 'beautify':
+            case 'beautify':
+                self.fig.set_facecolor('#2b2b2b')
+                for n in self.axs:
+                    n.set_facecolor('#3c3f41')
+                    n.spines[:].set_color('#747a80')
+                    n.tick_params(axis='both', which='both', colors='#747a80', labelcolor='#747a80')
+                    n.xaxis.label.set_color('#747a80')
+                    n.yaxis.label.set_color('#747a80')
+                    n.title.set_color('#747a80')
+                self.ax_progress.axis('off')
+            case _:
+                pass
+
+        self.scan_thread = threading.Thread(target=self.scan)
+
+        self.start_gui()
+
+    def on_close(self, event):
+        # print('Closed Figure!')
+        # self.update_process.terminate()
+        # sys.exit(0)
+        # raise SystemExit
+        pass
+
+    def draw_event_callback(self, event):
+        print("Draw Event Triggered!")
+
+    def onclick(self, event):
+        ix = event.xdata
+        iy = event.ydata
+
+        """for i, a in enumerate(self.axs):
+
+            # For information, print which axes the click was in
+            if a == event.inaxes:
+                print("Click is in axes ax{}".format(i + 1))"""
+
+        # Check if the click was in ax4 or ax5
+        if event.inaxes is self.ax_rmse:
+
+            """if ix is not None:
+                print('x = %f' % (ix))
+                print('y = %f' % (iy))"""
+
+            match self.ax_rmse.get_yscale():
+                case 'linear':
+                    self.ax_rmse.set_yscale('log')
+                case 'log':
+                    self.ax_rmse.set_yscale('linear')
+            self.fig.canvas.draw()
+            return ix, iy
+
+        else:
+            return
+
+    def start_gui(self):
+        # self.ani = animation.FuncAnimation(self.fig, self.redraw)
+
+        self.scan_thread.start()
+
+        # cid = self.fig.canvas.mpl_connect('close_event', self.on_close)
+        bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
+        # did = self.fig.canvas.mpl_connect('draw_event', self.draw_event_callback)
+
+        plt.text(0.35, 0.5, 'Close Me!', dict(size=30))
+
+        plt.show()
+
+    def scan(self):
+        try:
+            while True:
+                # while not self.queues['update_event'].is_set():
+                #     pass
+                self.queues['update_event'].wait()
+                self.queues['update_event'].clear()
+                self.update_function()
+        finally:
+            # This is required to automatically shutdown this thread when the figure is closed
+            return
+
+    def update_function(self):
+        state = self.queues['state_queue'].get()
+        self.queues['state_queue'].put(state)
+
+        if self.queues['epoch_event'].is_set():
+            self.update_epoch(state)
+            self.queues['epoch_event'].clear()
+        if self.queues['batch_event'].is_set():
+            self.update_batch(state)
+            self.queues['batch_event'].clear()
+
+        self.update_time(state)
+
+        self.fig.canvas.draw()
+        # self.ani.resume()
+
+    def update_epoch(self, state):
+        size = 0.05
+        progress_angle = (state['epoch'] / state['epochs']) * 360
+        val = -np.radians(progress_angle)
+
+        if self.epoch_bar is not None:
+            self.epoch_bar.remove()
+        self.epoch_bar = self.ax_progress.bar(x=np.radians(90),
+                                              width=val, bottom=0.65 - 2 * size, height=size,
+                                              edgecolor='w', color='#ffb600', linewidth=0, align="edge")
+
+        self.ax_prediction.clear()
+        self.ax_prediction.plot(state['target'], color='#c75450')
+        self.prediction_list.append(state['prediction'])
+        for n in range(len(self.prediction_list)):
+            self.ax_prediction.plot(self.prediction_list[n], color='#4a8fdd',
+                                    alpha=(1 / (len(self.prediction_list) - n)))
+
+        self.ax_prediction.set_ylim([0, 1])  # 60, 170
+        self.ax_prediction.set_ylabel('Price ($)')
+        self.ax_prediction.set_xlabel('Date')
+
+        self.ax_rmse.set_xlabel(str("Epoch " + str(state['epoch'])))
+
+    def update_batch(self, state):
+        size = 0.1
+        progress_angle = (state['batch'] / state['batches']) * 360
+        val = -np.radians(progress_angle)
+
+        if self.batch_bar is not None:
+            self.batch_bar.remove()
+        self.batch_bar = self.ax_progress.bar(x=np.radians(90),
+                                              width=val, bottom=0.8 - 2 * size, height=size,
+                                              edgecolor='orange', color='orange', linewidth=0, align="edge")
+
+        self.ax_rmse.set_ylabel(str("Batch " + str(state['batch'])))
+
+    def update_time(self, state):
+        seconds = round(time.time() - state['start_time'], 0)
+        seconds = seconds % (24 * 3600)
+        hour = seconds // 3600
+        seconds %= 3600
+        minutes = seconds // 60
+        seconds %= 60
+        if self.current_time_text is not None:
+            self.current_time_text.remove()
+        if hour != 0:
+            self.current_time_text = self.ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(hour)) + 'h ' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's', color='#747a80', size=9)
+        elif minutes != 0:
+            self.current_time_text = self.ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(minutes)) + 'm ' + str(int(seconds)) + 's', color='#747a80', size=9)
+        else:
+            self.current_time_text = self.ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)
+
+        self.fig.canvas.draw()
+
+    def redraw(self, frame):
+        # self.ani.pause()
+        pass
 
 
 
