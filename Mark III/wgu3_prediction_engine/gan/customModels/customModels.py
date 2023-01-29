@@ -4,6 +4,7 @@ from keras import layers
 import sys
 import time
 import numpy as np
+import scipy.stats as stats
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -284,6 +285,11 @@ class TrainingGui:
         self.epoch_bar = None
         self.batch_bar = None
         self.prediction_list = []
+        self.rmse_list = np.array([])
+        self.error_stats_list = []
+        while queues['scaler_queue'].empty():
+            pass
+        self.scaler_list = queues['scaler_queue'].get()
 
         self.fig = plt.figure(constrained_layout=True)
         gs = GridSpec(2, 3, figure=self.fig)
@@ -361,7 +367,7 @@ class TrainingGui:
         bid = self.fig.canvas.mpl_connect('button_press_event', self.onclick)
         # did = self.fig.canvas.mpl_connect('draw_event', self.draw_event_callback)
 
-        plt.text(0.35, 0.5, 'Close Me!', dict(size=30))
+        # plt.text(0.35, 0.5, 'Close Me!', dict(size=30))
 
         plt.show()
 
@@ -394,6 +400,7 @@ class TrainingGui:
         # self.ani.resume()
 
     def update_epoch(self, state):
+        # Progress Bar Axis
         size = 0.05
         progress_angle = (state['epoch'] / state['epochs']) * 360
         val = -np.radians(progress_angle)
@@ -404,18 +411,68 @@ class TrainingGui:
                                               width=val, bottom=0.65 - 2 * size, height=size,
                                               edgecolor='w', color='#ffb600', linewidth=0, align="edge")
 
+        # Prediction Axis
         self.ax_prediction.clear()
-        self.ax_prediction.plot(state['target'], color='#c75450')
-        self.prediction_list.append(state['prediction'])
+        target = np.ravel(self.scaler_list[0].inverse_transform(state['target'].reshape(-1, 1)))
+        self.ax_prediction.plot(target, color='#c75450')
+        prediction = np.ravel(self.scaler_list[0].inverse_transform(state['prediction'].reshape(-1, 1)))
+        self.prediction_list.append(prediction)
         for n in range(len(self.prediction_list)):
             self.ax_prediction.plot(self.prediction_list[n], color='#4a8fdd',
                                     alpha=(1 / (len(self.prediction_list) - n)))
 
-        self.ax_prediction.set_ylim([0, 1])  # 60, 170
+        self.ax_prediction.set_ylim([0, 170]) #60
         self.ax_prediction.set_ylabel('Price ($)')
         self.ax_prediction.set_xlabel('Date')
+        self.fig.canvas.draw()
 
-        self.ax_rmse.set_xlabel(str("Epoch " + str(state['epoch'])))
+        # RMSE Axis
+        old_x_lim = self.ax_rmse.get_xlim()
+        old_y_lim = self.ax_rmse.get_ylim()
+        old_scale = self.ax_rmse.get_yscale()
+        print("getting stuck at the scaler conversion of the loss")
+        np.append(self.rmse_list, state['loss'])
+        self.rmse_list = np.ravel(self.scaler_list[0].inverse_transform(self.rmse_list.reshape(-1, 1)))
+        print("getting past the scaler conversion of the loss")
+        if len(self.rmse_list) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(self.rmse_list[:-1]) - 1)) or (
+                (old_y_lim[0] > min(self.rmse_list[:-1])) or (old_y_lim[1] < max(self.rmse_list[:-1])))):
+            self.ax_rmse.clear()
+            self.ax_rmse.set_xlim(old_x_lim)
+            self.ax_rmse.set_ylim(old_y_lim)
+        else:
+            self.ax_rmse.clear()
+        match old_scale:
+            case 'linear':
+                self.ax_rmse.set_yscale('linear')
+            case 'log':
+                self.ax_rmse.set_yscale('log')
+        self.ax_rmse.plot(self.rmse_list, color='#4a8fdd')
+        self.ax_rmse.set_ylabel('RMSE')
+
+        # Histogram Axis
+        self.ax_histogram.clear()
+        diff = []
+        # target = state['target']
+        # prediction = state['prediction']
+        target = np.ravel(self.scaler_list[0].inverse_transform(state['target'].reshape(-1, 1)))
+        prediction = np.ravel(self.scaler_list[0].inverse_transform(state['prediction'].reshape(-1, 1)))
+        diff = target - prediction
+        # for i in range(len(target)):
+        #     diff.append(target[i] - prediction[i])
+        counts, bins = np.histogram(diff, bins='auto')
+        self.ax_histogram.hist(bins[:-1], bins, weights=counts * (5 / len(state['prediction'])))
+        mu = np.mean(diff)
+        sigma = np.std(diff)
+        self.error_stats_list.append([mu, sigma])
+        # print(len(self.error_stats_list))
+        for n in range(len(self.error_stats_list)):
+            # print((1 / (len(self.error_stats_list) - n)))
+            mu, sigma = self.error_stats_list[n]
+            x = np.linspace(mu - 10 * sigma, mu + 10 * sigma, 100)
+            self.ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd',
+                                   alpha=(1 / (len(self.error_stats_list) - n)))
+
+        # self.ax_rmse.set_xlabel(str("Epoch " + str(state['epoch'])))
 
     def update_batch(self, state):
         size = 0.1
@@ -428,7 +485,7 @@ class TrainingGui:
                                               width=val, bottom=0.8 - 2 * size, height=size,
                                               edgecolor='orange', color='orange', linewidth=0, align="edge")
 
-        self.ax_rmse.set_ylabel(str("Batch " + str(state['batch'])))
+        # self.ax_rmse.set_ylabel(str("Batch " + str(state['batch'])))
 
     def update_time(self, state):
         seconds = round(time.time() - state['start_time'], 0)

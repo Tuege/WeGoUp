@@ -17,7 +17,7 @@ import scipy.stats as stats
 from customModels import customModels as models
 
 
-def data_preprocessing(stock_data):
+def data_preprocessing(stock_data=None):
     stock_data.columns = stock_data.columns.str.lower()
     """
     stock_data = wrap(stock_data)
@@ -96,6 +96,14 @@ def data_preprocessing(stock_data):
     # split into training set and test set
     train_data = scaled_data[0:training_data_len, :]
     # np.savetxt('data_printout.csv', train_data, delimiter=',')
+    # retrieved_train_data = np.genfromtxt('data_printout.csv', delimiter=',', dtype=np.float64)
+    print("Successfully saved and retrieved training_data: ", train_data is retrieved_train_data)
+    print("Train_data shape:", np.shape(train_data))
+    print("Retrieved_train_data shape", np.shape(retrieved_train_data))
+    print("Train_data type:", type(train_data[0, 0]))
+    print("Retrieved_train_data type", type(retrieved_train_data[0, 0]))
+    print("Train_data head:", train_data[:5])
+    print("Retrieved_train_data head", retrieved_train_data[:5])
     x_train = []
     y_train = []
 
@@ -126,6 +134,8 @@ def train(queues):
     x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
     print(np.shape(x_train))
 
+    queues['scaler_queue'].put(scaler_list)
+
     rmse_list = []
     error_list = []
     predictions_list = []
@@ -133,7 +143,7 @@ def train(queues):
     x_train_original, y_train_original = x_train, y_train
     batch_size = 100
 
-    with tf.device('/GPU:0'):
+    with tf.device('/CPU:0'):
         # Create the discriminator
         discriminator = models.DiscriminatorModel()
 

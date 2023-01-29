@@ -5,9 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b74b02b8-afab-4288-9d0a-de66e4c35b71" name="Changes" comment="improvements to time in UI">
+      <change beforePath="$PROJECT_DIR$/.idea/Mark III.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Mark III.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/Changes.xml" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -18,12 +20,27 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
   </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProjectId" id="2KnMAN9tntOTEN6AJQeoJjV4PPv" />
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="false" id="Update" />
   </component>
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true"
+  }
+}]]></component>
   <component name="ShelveChangesManager">
     <option name="remove_strategy" value="true" />
   </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task id="LOCAL-00001" summary="added timing in UI">
       <created>1672178543188</created>
@@ -38,6 +55,13 @@
       <option name="presentableId" value="LOCAL-00002" />
       <option name="project" value="LOCAL" />
       <updated>1672266731571</updated>
+    </task>
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="b74b02b8-afab-4288-9d0a-de66e4c35b71" name="Changes" comment="improvements to time in UI" />
+      <created>1674605755677</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1674605755677</updated>
     </task>
     <option name="localTasksCounter" value="3" />
     <servers />
