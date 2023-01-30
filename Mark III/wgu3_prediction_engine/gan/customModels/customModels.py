@@ -376,8 +376,10 @@ class TrainingGui:
             while True:
                 # while not self.queues['update_event'].is_set():
                 #     pass
+
                 self.queues['update_event'].wait()
                 self.queues['update_event'].clear()
+
                 self.update_function()
         finally:
             # This is required to automatically shutdown this thread when the figure is closed
@@ -424,15 +426,18 @@ class TrainingGui:
         self.ax_prediction.set_ylim([0, 170]) #60
         self.ax_prediction.set_ylabel('Price ($)')
         self.ax_prediction.set_xlabel('Date')
-        self.fig.canvas.draw()
 
         # RMSE Axis
         old_x_lim = self.ax_rmse.get_xlim()
         old_y_lim = self.ax_rmse.get_ylim()
         old_scale = self.ax_rmse.get_yscale()
         print("getting stuck at the scaler conversion of the loss")
-        np.append(self.rmse_list, state['loss'])
-        self.rmse_list = np.ravel(self.scaler_list[0].inverse_transform(self.rmse_list.reshape(-1, 1)))
+
+        #self.rmse = self.scaler_list[0].inverse_transform(state['loss'])
+        rmse = self.scaler_list[0].inverse_transform([[state['loss']]])
+        print(rmse)
+        self.rmse_list = np.append(self.rmse_list, rmse)
+        print("Losses: ", self.rmse_list)
         print("getting past the scaler conversion of the loss")
         if len(self.rmse_list) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(self.rmse_list[:-1]) - 1)) or (
                 (old_y_lim[0] > min(self.rmse_list[:-1])) or (old_y_lim[1] < max(self.rmse_list[:-1])))):
@@ -454,11 +459,11 @@ class TrainingGui:
         diff = []
         # target = state['target']
         # prediction = state['prediction']
+        # for i in range(len(target)):
+        #     diff.append(target[i] - prediction[i])
         target = np.ravel(self.scaler_list[0].inverse_transform(state['target'].reshape(-1, 1)))
         prediction = np.ravel(self.scaler_list[0].inverse_transform(state['prediction'].reshape(-1, 1)))
         diff = target - prediction
-        # for i in range(len(target)):
-        #     diff.append(target[i] - prediction[i])
         counts, bins = np.histogram(diff, bins='auto')
         self.ax_histogram.hist(bins[:-1], bins, weights=counts * (5 / len(state['prediction'])))
         mu = np.mean(diff)
@@ -503,7 +508,7 @@ class TrainingGui:
         else:
             self.current_time_text = self.ax_progress.text(np.radians(135), 1, 'Run Time:\n' + str(int(seconds)) + 's', color='#747a80', size=9)
 
-        self.fig.canvas.draw()
+        # self.fig.canvas.draw()
 
     def redraw(self, frame):
         # self.ani.pause()
