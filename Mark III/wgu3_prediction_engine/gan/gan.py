@@ -122,10 +122,37 @@ def data_preprocessing(stock_data=None):
     return x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len
 
 
+def data_collection(stock_data=None):
+    stock_data.columns = stock_data.columns.str.lower()
+    """
+    stock_data = wrap(stock_data)
+    # stock_data['macd']
+    stock_data.init_all()
+    stock_data = unwrap(stock_data)
+    stock_data.dropna(inplace=True)
+    """
+    """
+                     Open       High        Low      Close  Adj Close     Volume
+    Date                                                                        
+    2016-01-04  25.652500  26.342501  25.500000  26.337500  24.111500  270597600
+    2016-01-05  26.437500  26.462500  25.602501  25.677500  23.507280  223164000
+    2016-01-06  25.139999  25.592501  24.967501  25.174999  23.047245  273829600
+    2016-01-07  24.670000  25.032499  24.107500  24.112499  22.074558  324377600
+    2016-01-08  24.637501  24.777500  24.190001  24.240000  22.191275  283192000
+    <class 'pandas.core.frame.DataFrame'>
+
+    # print(type(stock_data.head()))
+    """
+
+    all_values = stock_data.values
+
+    return all_values
+
+
 def train(queues):
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
     x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
-    print(np.shape(x_train))
+    data = data_collection(stock_data)
 
     queues['scaler_queue'].put(scaler_list)
 
@@ -135,6 +162,11 @@ def train(queues):
     batch_time_list = []
     x_train_original, y_train_original = x_train, y_train
     batch_size = 100
+
+    settings = {
+        'epoch_num': 25,
+        'batch_size': 100,
+    }
 
     with tf.device('/GPU:0'):
         # Create the discriminator
@@ -160,34 +192,30 @@ def train(queues):
         scheduler_callback = model.CustomCallbacks.Scheduler()
         progress_callbacks = model.CustomCallbacks.Progress(queues=queues)
 
-        if True:
-            start_time = time.time()
-            # x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
+        model.fit(x_train, y_train, batch_size=settings['batch_size'], epochs=settings['epoch_num'], callbacks=[progress_callbacks, scheduler_callback])
 
-            model.fit(x_train, y_train, batch_size=batch_size, epochs=25, callbacks=[progress_callbacks, scheduler_callback])
+        # gui_process = mp.Process(target=model.TrainingGui, args=(queues,))
+        # gui_process.start()
 
-            # gui_process = mp.Process(target=model.TrainingGui, args=(queues,))
-            # gui_process.start()
+        predictions = model.predict(x_test, verbose=False)
+        predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
+        target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
+        rmse = np.sqrt(np.mean(predictions - target) ** 2)
+        error = np.sum(np.absolute(predictions - target))
+        predictions_list.append(predictions)
+        rmse_list.append(rmse)
+        error_list.append(error)
+        end_time = time.time()
 
-            predictions = model.predict(x_test, verbose=False)
-            predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
-            target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
-            rmse = np.sqrt(np.mean(predictions - target) ** 2)
-            error = np.sum(np.absolute(predictions - target))
-            predictions_list.append(predictions)
-            rmse_list.append(rmse)
-            error_list.append(error)
-            end_time = time.time()
-
-            # Save model if it's good
-            if (error == min(error_list)) and (rmse < 1):
-                print("model saved")
-                #model.save('optimal_model3')
-            batch_time = end_time-start_time
-            batch_time_list.append(batch_time)
-            # TODO: tim_queue.put(batch_time_list)
-            #   disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
-            print(rmse_list)
+        # Save model if it's good
+        if (error == min(error_list)) and (rmse < 1):
+            print("model saved")
+            #model.save('optimal_model3')
+        batch_time = end_time-start_time
+        batch_time_list.append(batch_time)
+        # TODO: tim_queue.put(batch_time_list)
+        #   disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
+        print(rmse_list)
 
     data = stock_data.filter(['close'])
     train = data[:training_data_len]

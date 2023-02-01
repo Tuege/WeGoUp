@@ -29,6 +29,7 @@ class DiscriminatorModel (keras.Sequential):
 class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
     def __init__(self, shape=None, **kwargs):
         super().__init__(name='generator', **kwargs)
+
         self.add(layers.LSTM(100, return_sequences=True, input_shape=shape))
         self.add(layers.LSTM(100, return_sequences=False))
         self.add(layers.Dense(25))
@@ -46,6 +47,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
         )
 
         self.queues = {}
+        self.series = None
 
     @tf.function
     def train_step(self, inputs, labels):
@@ -64,6 +66,7 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             self,
             x=None,
             y=None,
+            series=None,
             batch_size=None,
             epochs=1,
             verbose="auto",
@@ -82,9 +85,8 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             workers=1,
             use_multiprocessing=False,
     ):
-        # dataset = tf.data.Dataset.from_tensor_slices((x, y))
         logs = {}
-        # if callbacks is not None:
+        self.series = series
         self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
         self.stop_training = False
 
@@ -284,6 +286,9 @@ class TrainingGui:
         self.current_time_text = None
         self.epoch_bar = None
         self.batch_bar = None
+        self.one_mu_fill = None
+        self.two_mu_fill = None
+        self.three_mu_fill = None
         self.prediction_list = []
         self.rmse_list = np.array([])
         self.error_stats_list = []
@@ -431,14 +436,9 @@ class TrainingGui:
         old_x_lim = self.ax_rmse.get_xlim()
         old_y_lim = self.ax_rmse.get_ylim()
         old_scale = self.ax_rmse.get_yscale()
-        print("getting stuck at the scaler conversion of the loss")
 
-        #self.rmse = self.scaler_list[0].inverse_transform(state['loss'])
         rmse = self.scaler_list[0].inverse_transform([[state['loss']]])
-        print(rmse)
         self.rmse_list = np.append(self.rmse_list, rmse)
-        print("Losses: ", self.rmse_list)
-        print("getting past the scaler conversion of the loss")
         if len(self.rmse_list) > 2 and (((old_x_lim[0] > 0) or (old_x_lim[1] < len(self.rmse_list[:-1]) - 1)) or (
                 (old_y_lim[0] > min(self.rmse_list[:-1])) or (old_y_lim[1] < max(self.rmse_list[:-1])))):
             self.ax_rmse.clear()
@@ -463,13 +463,35 @@ class TrainingGui:
         #     diff.append(target[i] - prediction[i])
         target = np.ravel(self.scaler_list[0].inverse_transform(state['target'].reshape(-1, 1)))
         prediction = np.ravel(self.scaler_list[0].inverse_transform(state['prediction'].reshape(-1, 1)))
+
         diff = target - prediction
-        counts, bins = np.histogram(diff, bins='auto')
-        self.ax_histogram.hist(bins[:-1], bins, weights=counts * (5 / len(state['prediction'])))
         mu = np.mean(diff)
         sigma = np.std(diff)
         self.error_stats_list.append([mu, sigma])
-        # print(len(self.error_stats_list))
+
+        counts, bins = np.histogram(diff, bins='auto')
+        self.histogram = self.ax_histogram.hist(bins[:-1], bins, weights=counts * (5 / len(state['prediction'])))
+        lower, upper = self.ax_histogram.get_ylim()
+
+        if self.one_mu_fill is not None:
+            self.one_mu_fill.remove()
+        if self.two_mu_fill is not None:
+            self.two_mu_fill.remove()
+        if self.three_mu_fill is not None:
+            self.three_mu_fill.remove()
+        self.one_mu_fill = self.ax_histogram.fill_between([-sigma + mu, sigma + mu], 0, 1, color='#2b2b2b', alpha=0.2)
+        self.two_mu_fill = self.ax_histogram.fill_between([-2*sigma + mu, 2*sigma + mu], 0, 1, color='#2b2b2b', alpha=0.2)
+        self.three_mu_fill = self.ax_histogram.fill_between([-3*sigma + mu, 3*sigma + mu], 0, 1, color='#2b2b2b', alpha=0.2)
+
+        for rect in self.histogram[2]:
+            rect.remove()
+        self.histogram = self.ax_histogram.hist(bins[:-1], bins, weights=counts * (5 / len(state['prediction'])), color='#386eaa')
+
+        self.ax_histogram.axvline(0, ls='-', color='#c75450', alpha=0.5, linewidth=0.5)
+
+        print(self.ax_histogram.bbox)
+        self.ax_histogram.text(sigma+mu, upper*0.9, r'$1\sigma$', color='#747a80', size=7, ha='center')
+
         for n in range(len(self.error_stats_list)):
             # print((1 / (len(self.error_stats_list) - n)))
             mu, sigma = self.error_stats_list[n]
@@ -477,6 +499,8 @@ class TrainingGui:
             self.ax_histogram.plot(x, abs(mu) * 0.3 * stats.norm.pdf(x, mu, sigma), color='#4a8fdd',
                                    alpha=(1 / (len(self.error_stats_list) - n)))
 
+        self.ax_histogram.set_xlim(-4.5 * sigma, 4.5 * sigma)
+        self.ax_histogram.set_ylim(lower, upper)
         # self.ax_rmse.set_xlabel(str("Epoch " + str(state['epoch'])))
 
     def update_batch(self, state):
