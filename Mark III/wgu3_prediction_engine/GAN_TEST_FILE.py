@@ -10,7 +10,7 @@ from gan.customModels import customModels
 import os
 import sys
 import time
-from alive_progress import alive_bar
+# from alive_progress import alive_bar
 import importlib
 import tensorflow as tf
 
