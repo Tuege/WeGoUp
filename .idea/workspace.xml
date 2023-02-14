@@ -9,8 +9,9 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="rmse and histogram work again and increased update rate of gui">
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="histogram fixed">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
@@ -271,7 +272,14 @@
       <option name="project" value="LOCAL" />
       <updated>1675122822679</updated>
     </task>
-    <option name="localTasksCounter" value="26" />
+    <task id="LOCAL-00026" summary="histogram fixed">
+      <created>1675254178058</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1675254178058</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -298,7 +306,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="." />
     <MESSAGE value="added partial threading" />
     <MESSAGE value="changed gan to prediction_engine" />
     <MESSAGE value="fixing file types" />
@@ -323,7 +330,8 @@
     <MESSAGE value="fixed unresponsive behavior" />
     <MESSAGE value="progress bars andprediction gui implemented" />
     <MESSAGE value="rmse and histogram work again and increased update rate of gui" />
-    <option name="LAST_COMMIT_MESSAGE" value="rmse and histogram work again and increased update rate of gui" />
+    <MESSAGE value="histogram fixed" />
+    <option name="LAST_COMMIT_MESSAGE" value="histogram fixed" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>

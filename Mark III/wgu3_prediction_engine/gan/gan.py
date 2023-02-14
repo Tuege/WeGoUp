@@ -161,19 +161,25 @@ def train(queues):
     predictions_list = []
     batch_time_list = []
     x_train_original, y_train_original = x_train, y_train
-    batch_size = 100
 
     settings = {
-        'epoch_num': 25,
+        'epochs': 100,
         'batch_size': 100,
+
+        'n_input_days': 60,
+        'n_prediction_days': 2,
+        'features': data.shape[1],
+
+        'training_data_len': math.ceil(data.shape[0] * 0.8),
     }
+    queues['settings_queue'].put(settings)
 
     with tf.device('/GPU:0'):
         # Create the discriminator
         discriminator = models.DiscriminatorModel()
 
         # Create the generator
-        model = models.GeneratorModel(shape=(x_train.shape[1], x_train.shape[2]))
+        model = models.GeneratorModel(queues=queues)
         model.summary()
 
         # Import the custom Metrics
@@ -192,30 +198,21 @@ def train(queues):
         scheduler_callback = model.CustomCallbacks.Scheduler()
         progress_callbacks = model.CustomCallbacks.Progress(queues=queues)
 
-        model.fit(x_train, y_train, batch_size=settings['batch_size'], epochs=settings['epoch_num'], callbacks=[progress_callbacks, scheduler_callback])
-
-        # gui_process = mp.Process(target=model.TrainingGui, args=(queues,))
-        # gui_process.start()
+        model.fit(x_train, y_train, data=data, batch_size=settings['batch_size'], epochs=settings['epochs'], callbacks=[progress_callbacks, scheduler_callback])
 
         predictions = model.predict(x_test, verbose=False)
-        predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
-        target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
-        rmse = np.sqrt(np.mean(predictions - target) ** 2)
-        error = np.sum(np.absolute(predictions - target))
-        predictions_list.append(predictions)
-        rmse_list.append(rmse)
-        error_list.append(error)
-        end_time = time.time()
+        # predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
+        # target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
+        # rmse = np.sqrt(np.mean(predictions - target) ** 2)
+        # error = np.sum(np.absolute(predictions - target))
+        # predictions_list.append(predictions)
+        # rmse_list.append(rmse)
+        # error_list.append(error)
 
         # Save model if it's good
-        if (error == min(error_list)) and (rmse < 1):
-            print("model saved")
-            #model.save('optimal_model3')
-        batch_time = end_time-start_time
-        batch_time_list.append(batch_time)
-        # TODO: tim_queue.put(batch_time_list)
-        #   disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
-        print(rmse_list)
+        # if (error == min(error_list)) and (rmse < 1):
+        #     print("model saved")
+        #     #model.save('optimal_model3')
 
     data = stock_data.filter(['close'])
     train = data[:training_data_len]

@@ -3,8 +3,10 @@ from tensorflow import keras
 from keras import layers
 import sys
 import time
+import math
 import numpy as np
 import scipy.stats as stats
+from sklearn.preprocessing import MinMaxScaler
 import threading
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
@@ -27,13 +29,17 @@ class DiscriminatorModel (keras.Sequential):
 
 
 class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
-    def __init__(self, shape=None, **kwargs):
+    def __init__(self, queues, **kwargs):
         super().__init__(name='generator', **kwargs)
 
-        self.add(layers.LSTM(100, return_sequences=True, input_shape=shape))
+        self.queues = queues
+        self.settings = self.queues['settings_queue'].get()
+        self.queues['settings_queue'].put(self.settings)
+
+        self.add(layers.LSTM(100, return_sequences=True, input_shape=(self.settings['n_input_days'], self.settings['features'])))
         self.add(layers.LSTM(100, return_sequences=False))
         self.add(layers.Dense(25))
-        self.add(layers.Dense(1))
+        self.add(layers.Dense(self.settings['n_prediction_days']))
 
         callbacks = []
         self.callbacks = keras.callbacks.CallbackList(
@@ -46,7 +52,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             # steps=data_handler.inferred_steps,
         )
 
-        self.queues = {}
         self.series = None
 
     @tf.function
@@ -56,7 +61,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             loss_value = self.compiled_loss(labels, predictions)
         grads = tape.gradient(loss_value, self.trainable_weights)
         self.optimizer.apply_gradients(zip(grads, self.trainable_weights))
-        # train_acc_metric.update_state(y, predictions)
         self.compiled_metrics.update_state(labels, predictions)
         # return loss_value
 
@@ -66,8 +70,9 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             self,
             x=None,
             y=None,
-            series=None,
-            batch_size=None,
+            data=None,
+            batch_size=1,
+            train_split=0.8,
             epochs=1,
             verbose="auto",
             callbacks=None,
@@ -86,13 +91,16 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             use_multiprocessing=False,
     ):
         logs = {}
-        self.series = series
+
+        self.data = data
+
         self.callbacks = keras.callbacks.CallbackList(callbacks=callbacks, model=self, verbose=True, epochs=epochs,)
         self.stop_training = False
 
-        print('Input shape: ', np.shape(x))
+        print('Input shape: ', np.shape(self.data))
 
-        # self.reset_metrics()
+        self.data_preprocessing()
+
         self.compiled_metrics.update_state(None, None)
         for m in self.metrics:
             if m.name == 'epoch':
@@ -100,11 +108,12 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             elif m.name == 'epochs':
                 m.update_epochs(epochs)
             elif m.name == 'batches':
-                m.update_batches(np.shape(x)[0]-(batch_size-1))
+                # m.update_batches(np.shape(x)[0]-(batch_size-1))
+                pass
 
         logs['epochs'] = epochs
-        logs['batches'] = np.shape(x)[0]-(batch_size-1)
-        logs['target'] = y
+        logs['batches'] = self.settings['training_data_len']-(self.settings['batch_size']-1)
+        logs['target'] = self.data[self.settings['training_data_len']:, 0]
         self.callbacks.on_train_begin(logs)
 
         # Training loop
@@ -119,10 +128,10 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             self.callbacks.on_epoch_begin(epoch, logs)
 
             # Loop over the batches of the dataset
-            # for step, (x_batch_train, y_batch_train) in enumerate(dataset):
-            for batch in range(0, np.shape(x)[0]-(batch_size-1), 1):
+            for batch in range(0, self.settings['training_data_len']-(self.settings['n_input_days']+self.settings['batch_size']-1)+1, 1):
                 self.callbacks.on_batch_begin(batch, logs)
                 x_batch_train, y_batch_train = x[batch:batch_size + batch], y[batch:batch_size + batch]
+                x_batch_train, y_batch_train = self.collate_batch_data(batch=batch)
                 # Compute a training step
                 logs = self.train_step(x_batch_train, y_batch_train)
 
@@ -137,11 +146,48 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
             # print('Epoch {}: loss = {}'.format(epoch+1, loss_value))
             # for m in self.metrics:
             #     print('    {}: {}'.format(m.name, m.result()))
+            #logs['prediction'] = self(self.data[training_data_len:training_data_len+self.shape[0]].reshape(1, -1, self.shape[1]), training=False)
 
-            logs['prediction'] = self(x, training=False)
+            # logs['prediction'] = self(x_batch_train)
+            print(self.evaluate(self.data[self.settings['training_data_len']-self.settings['n_input_days']:self.settings['training_data_len']], self.data[self.settings['training_data_len']:self.settings['training_data_len']+self.settings['n_prediction_days']], verbose=False))
+            logs['prediction'] = self(x_batch_train[0].reshape(-1,np.shape(x_batch_train)[1],np.shape(x_batch_train)[2]))
             self.callbacks.on_epoch_end(epoch, logs)
             if self.stop_training:
                 break
+
+    def data_preprocessing(self):
+        # Normalising the Data  between 0 and 1
+        self.data = self.data.astype(np.float64)
+        self.scaler_list = []
+
+        for feature in range(self.data.shape[1]):
+            self.scaler_list.append(MinMaxScaler(feature_range=(0, 1)))
+            self.data[:, feature] = np.ravel(self.scaler_list[feature].fit_transform(self.data[:, feature].reshape(-1, 1)))
+
+        self.data = np.array(self.data)
+
+    def collate_batch_data(self, batch):
+        # np.savetxt('data_printout.csv', train_data, delimiter=',')
+        # retrieved_train_data = np.genfromtxt('data_printout.csv', delimiter=',', dtype=np.float64)
+        x_train = []
+        y_train = []
+
+        # shift the input and back to get the output array
+        # create an n-day window of data that is used to
+        for batch_slice in range(self.settings['batch_size']):
+            # n_input_days = self.shape[0]
+            x_train.append(self.data[batch+batch_slice:batch+self.settings['n_input_days']+batch_slice])
+            y_train.append(self.data[batch+self.settings['n_input_days']+batch_slice:batch+self.settings['n_input_days']+self.settings['n_prediction_days']+batch_slice, 0])
+
+        # convert into a numpy array
+        x_train, y_train = np.array(x_train), np.array(y_train)
+        x_train_old = x_train
+        x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], x_train.shape[2]))
+        #(100,60,6)
+        y_train = np.reshape(y_train, (y_train.shape[0], y_train.shape[1], 1))
+        #(100,30,1)
+
+        return x_train, y_train
 
     class CustomCallbacks:
         class Scheduler(keras.callbacks.LearningRateScheduler):
@@ -203,8 +249,6 @@ class GeneratorModel(keras.Sequential):  # , keras.callbacks.Callback):
                 self.queues['state_queue'].put(state)
                 self.queues['update_event'].set()
                 self.queues['batch_event'].set()
-                # self.queues['batch_prog_queue'].put([[epoch + 1, epochs, 1], [batch + 1, 200, 1]])
-                # print('batch', batch+1)
 
     class CustomMetrics:
         class _CustomMetric(keras.metrics.Metric):
@@ -295,6 +339,7 @@ class TrainingGui:
         while queues['scaler_queue'].empty():
             pass
         self.scaler_list = queues['scaler_queue'].get()
+
 
         self.fig = plt.figure(constrained_layout=True)
         gs = GridSpec(2, 3, figure=self.fig)
@@ -420,14 +465,18 @@ class TrainingGui:
 
         # Prediction Axis
         self.ax_prediction.clear()
-        target = np.ravel(self.scaler_list[0].inverse_transform(state['target'].reshape(-1, 1)))
+        target = np.ravel(self.scaler_list[0].inverse_transform(state['target'][0:2].reshape(-1, 1)))
         self.ax_prediction.plot(target, color='#c75450')
         prediction = np.ravel(self.scaler_list[0].inverse_transform(state['prediction'].reshape(-1, 1)))
+        prediction = prediction.reshape(-1, 2)
         self.prediction_list.append(prediction)
-        for n in range(len(self.prediction_list)):
-            self.ax_prediction.plot(self.prediction_list[n], color='#4a8fdd',
-                                    alpha=(1 / (len(self.prediction_list) - n)))
+        print(np.shape(self.prediction_list))
+        for n in range(np.shape(self.prediction_list)[0]):
+            print(self.prediction_list[n][0])
+            for i in range(1):
+                self.ax_prediction.plot(list(range(i, 2+i)), self.prediction_list[n][i], color='#4a8fdd', alpha=(1 / ( (np.shape(self.prediction_list)[0] - n))))
 
+        print(2)
         self.ax_prediction.set_ylim([0, 170]) #60
         self.ax_prediction.set_ylabel('Price ($)')
         self.ax_prediction.set_xlabel('Date')
@@ -454,6 +503,7 @@ class TrainingGui:
         self.ax_rmse.plot(self.rmse_list, color='#4a8fdd')
         self.ax_rmse.set_ylabel('RMSE')
 
+        """
         # Histogram Axis
         self.ax_histogram.clear()
         diff = []
@@ -489,7 +539,6 @@ class TrainingGui:
 
         self.ax_histogram.axvline(0, ls='-', color='#c75450', alpha=0.5, linewidth=0.5)
 
-        print(self.ax_histogram.bbox)
         self.ax_histogram.text(sigma+mu, upper*0.9, r'$1\sigma$', color='#747a80', size=7, ha='center')
 
         for n in range(len(self.error_stats_list)):
@@ -502,6 +551,7 @@ class TrainingGui:
         self.ax_histogram.set_xlim(-4.5 * sigma, 4.5 * sigma)
         self.ax_histogram.set_ylim(lower, upper)
         # self.ax_rmse.set_xlabel(str("Epoch " + str(state['epoch'])))
+        """
 
     def update_batch(self, state):
         size = 0.1

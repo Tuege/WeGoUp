@@ -310,27 +310,23 @@ if __name__ == '__main__':
     run_mode = 'train'
 
     # Setup queues for inter-process communications
-    display_queue = mp.Queue()
-    progress_queue = mp.Queue()
-    time_queue = mp.Queue()
     scaler_queue = mp.Queue()
     state_queue = mp.Queue()
+    settings_queue = mp.Queue()
+
     update_event = mp.Event()
     epoch_event = mp.Event()
     batch_event = mp.Event()
 
     queues = {
-        'batch_prog_queue': progress_queue,
-        'display_queue': display_queue,
-        'time_queue': time_queue,
         'scaler_queue': scaler_queue,
         'state_queue': state_queue,
+        'settings_queue': settings_queue,
+        
         'update_event': update_event,
         'epoch_event': epoch_event,
         'batch_event': batch_event,
     }
-
-
 
     match run_mode:
         case 'train':
