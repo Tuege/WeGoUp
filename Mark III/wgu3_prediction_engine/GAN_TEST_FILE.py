@@ -1,6 +1,5 @@
 import multiprocessing as mp
 import sys
-
 from gan import gan
 from gan.customModels import customModels
 
