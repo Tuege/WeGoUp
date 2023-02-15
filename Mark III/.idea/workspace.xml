@@ -4,13 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b74b02b8-afab-4288-9d0a-de66e4c35b71" name="Changes" comment="improvements to time in UI">
-      <change beforePath="$PROJECT_DIR$/.idea/Mark III.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/Mark III.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Changes.xml" beforeDir="false" />
+    <list default="true" id="b74b02b8-afab-4288-9d0a-de66e4c35b71" name="Changes" comment="ui not updating the rmse">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,12 +26,12 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="ShelveChangesManager">
     <option name="remove_strategy" value="true" />
   </component>
@@ -63,7 +58,14 @@
       <option name="presentableId" value="Default" />
       <updated>1674605755677</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="ui not updating the rmse">
+      <created>1675024925786</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1675024925786</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -80,6 +82,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="added timing in UI" />
     <MESSAGE value="improvements to time in UI" />
-    <option name="LAST_COMMIT_MESSAGE" value="improvements to time in UI" />
+    <MESSAGE value="ui not updating the rmse" />
+    <option name="LAST_COMMIT_MESSAGE" value="ui not updating the rmse" />
   </component>
 </project>
