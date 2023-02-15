@@ -1,10 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <module type="PYTHON_MODULE" version="4">
   <component name="NewModuleRootManager">
+<<<<<<< HEAD
+    <content url="file://$MODULE_DIR$" />
+    <orderEntry type="jdk" jdkName="Python 3.9" jdkType="Python SDK" />
+=======
     <content url="file://$MODULE_DIR$">
       <sourceFolder url="file://$MODULE_DIR$/wgu3_prediction_engine/gan" isTestSource="false" />
     </content>
     <orderEntry type="jdk" jdkName="Python 3.10 (GAN310)" jdkType="Python SDK" />
+>>>>>>> cf75345c75f4da82db900aa6b6f2263c40d05386
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
 </module>
