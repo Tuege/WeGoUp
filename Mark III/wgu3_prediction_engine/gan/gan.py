@@ -8,15 +8,16 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 import tensorflow as tf
 from tensorflow import keras
-from tensorflow.keras import layers
+from keras import layers
 from stockstats import StockDataFrame
 from stockstats import wrap, unwrap
 import multiprocessing as mp
 import time
 import scipy.stats as stats
+from customModels import customModels as models
 
 
-def data_preprocessing(stock_data):
+def data_preprocessing(stock_data=None):
     stock_data.columns = stock_data.columns.str.lower()
     """
     stock_data = wrap(stock_data)
@@ -93,19 +94,19 @@ def data_preprocessing(stock_data):
     """
 
     # split into training set and test set
-    # scaled_data = scaled_data[4:]
     train_data = scaled_data[0:training_data_len, :]
-    np.savetxt('data_printout.csv', train_data, delimiter=',')
+    # np.savetxt('data_printout.csv', train_data, delimiter=',')
+    # retrieved_train_data = np.genfromtxt('data_printout.csv', delimiter=',', dtype=np.float64)
     x_train = []
     y_train = []
 
     # shift the input and back to get the output array
-    # create a 60 day window of data100 that is used to
+    # create a 60-day window of data that is used to
     for i in range(60, len(train_data)):
         x_train.append(train_data[i - 60:i])
         y_train.append(train_data[i, 0])
 
-    # convert into a numpy
+    # convert into a numpy array
     x_train, y_train = np.array(x_train), np.array(y_train)
     x_train = np.reshape(x_train, (x_train.shape[0], x_train.shape[1], x_train.shape[2]))
 
@@ -121,67 +122,100 @@ def data_preprocessing(stock_data):
     return x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len
 
 
-training_shift = None
+def data_collection(stock_data=None):
+    stock_data.columns = stock_data.columns.str.lower()
+    """
+    stock_data = wrap(stock_data)
+    # stock_data['macd']
+    stock_data.init_all()
+    stock_data = unwrap(stock_data)
+    stock_data.dropna(inplace=True)
+    """
+    """
+                     Open       High        Low      Close  Adj Close     Volume
+    Date                                                                        
+    2016-01-04  25.652500  26.342501  25.500000  26.337500  24.111500  270597600
+    2016-01-05  26.437500  26.462500  25.602501  25.677500  23.507280  223164000
+    2016-01-06  25.139999  25.592501  24.967501  25.174999  23.047245  273829600
+    2016-01-07  24.670000  25.032499  24.107500  24.112499  22.074558  324377600
+    2016-01-08  24.637501  24.777500  24.190001  24.240000  22.191275  283192000
+    <class 'pandas.core.frame.DataFrame'>
+
+    # print(type(stock_data.head()))
+    """
+
+    all_values = stock_data.values
+
+    return all_values
 
 
-def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
-    global training_shift
+def train(queues):
     stock_data = yf.download('AAPL', start='2016-01-01', end='2021-10-01')
-    x_train, y_train, x_test, y_test, scaler_list, stock_data , training_data_len = data_preprocessing(stock_data)
+    x_train, y_train, x_test, y_test, scaler_list, stock_data, training_data_len = data_preprocessing(stock_data)
+    data = data_collection(stock_data)
 
-    def scheduler(epoch, lr):
-        if epoch < 1:
-            return lr
-        else:
-            return lr * 1
-            # print(lr * tf.math.exp(-0.1))
-            # return lr * tf.math.exp(-0.1)
-
-    class CustomCallbacks(keras.callbacks.Callback):
-        def on_epoch_end(self, epoch, logs=None):
-            prog_queue.put([[epoch+1, 5, 1], [training_shift+1, 200, 1]])
-
-    scheduler_callback = tf.keras.callbacks.LearningRateScheduler(scheduler)
+    queues['scaler_queue'].put(scaler_list)
 
     rmse_list = []
     error_list = []
     predictions_list = []
     batch_time_list = []
     x_train_original, y_train_original = x_train, y_train
+    batch_size = 100
+
+    settings = {
+        'epoch_num': 25,
+        'batch_size': 100,
+    }
 
     with tf.device('/GPU:0'):
-        model = keras.Sequential()
-        model.add(layers.LSTM(100, return_sequences=True, input_shape=(x_train.shape[1], x_train.shape[2])))
-        model.add(layers.LSTM(100, return_sequences=False))
-        model.add(layers.Dense(25))
-        model.add(layers.Dense(1))
+        # Create the discriminator
+        discriminator = models.DiscriminatorModel()
+
+        # Create the generator
+        model = models.GeneratorModel(shape=(x_train.shape[1], x_train.shape[2]))
         model.summary()
 
-        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error')
+        # Import the custom Metrics
+        progress_metrics = [
+            # model.CustomMetrics.Loss(),
+            model.CustomMetrics.Epoch(),
+            model.CustomMetrics.Epochs(),
+            model.CustomMetrics.Batch(),
+            model.CustomMetrics.Batches(),
+        ]
 
-        for training_shift in range(0, 200, 1):
-            start_time = time.time()
-            x_train, y_train = x_train_original[training_shift:100 + training_shift], y_train_original[training_shift:100 + training_shift]
-            model.fit(x_train, y_train, batch_size=1, epochs=5, callbacks=[scheduler_callback, CustomCallbacks()])
+        # Compile Model
+        model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=0.00003), loss='mean_squared_error', metrics=progress_metrics)
 
-            predictions = model.predict(x_test, verbose=False)
+        # Import the custom Callbacks
+        scheduler_callback = model.CustomCallbacks.Scheduler()
+        progress_callbacks = model.CustomCallbacks.Progress(queues=queues)
 
-            predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
-            target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
-            rmse = np.sqrt(np.mean(predictions - target) ** 2)
-            error = np.sum(np.absolute(predictions - target))
-            predictions_list.append(predictions)
-            rmse_list.append(rmse)
-            error_list.append(error)
-            end_time = time.time()
-            if (error == min(error_list)) and (rmse < 1):
-                print(training_shift)
-                model.save('optimal_model3')
-            batch_time = end_time-start_time
-            batch_time_list.append(batch_time)
-            tim_queue.put(batch_time_list)
-            disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
-            print(rmse_list)
+        model.fit(x_train, y_train, batch_size=settings['batch_size'], epochs=settings['epoch_num'], callbacks=[progress_callbacks, scheduler_callback])
+
+        # gui_process = mp.Process(target=model.TrainingGui, args=(queues,))
+        # gui_process.start()
+
+        predictions = model.predict(x_test, verbose=False)
+        predictions = np.ravel(scaler_list[0].inverse_transform(predictions.reshape(-1, 1)))
+        target = np.ravel(scaler_list[0].inverse_transform(y_test.reshape(-1, 1)))
+        rmse = np.sqrt(np.mean(predictions - target) ** 2)
+        error = np.sum(np.absolute(predictions - target))
+        predictions_list.append(predictions)
+        rmse_list.append(rmse)
+        error_list.append(error)
+        end_time = time.time()
+
+        # Save model if it's good
+        if (error == min(error_list)) and (rmse < 1):
+            print("model saved")
+            #model.save('optimal_model3')
+        batch_time = end_time-start_time
+        batch_time_list.append(batch_time)
+        # TODO: tim_queue.put(batch_time_list)
+        #   disp_queue.put([rmse_list, target, predictions, error_list, batch_time_list])
+        print(rmse_list)
 
     data = stock_data.filter(['close'])
     train = data[:training_data_len]
@@ -220,7 +254,6 @@ def train(disp_queue: mp.Queue, prog_queue: mp.Queue, tim_queue: mp.Queue):
 
     plt.legend(handles=tuple(line_list), loc='lower right')
     plt.show()
-    mp.current_process().terminate()
 
 
 def run():

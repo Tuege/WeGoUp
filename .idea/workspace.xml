@@ -9,18 +9,17 @@
     <option name="rewriteBookmarkType" value="true" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="added run method for testing">
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_12_2022_14_13_[Changes]/shelved.patch" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/shelf/Uncommitted_changes_before_Update_at_08_12_2022_14_13__Changes_.xml" beforeDir="false" />
+<<<<<<< HEAD
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="add comment here">
+      <change beforePath="$PROJECT_DIR$/.idea/misc.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/misc.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/data_printout.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/.idea/Mark III.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/.idea/Mark III.iml" afterDir="false" />
+=======
+    <list default="true" id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="rmse and histogram work again and increased update rate of gui">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/customModels/customModels.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" beforeDir="false" afterPath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/gan/gan.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/checkpoint" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-1.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-1.index" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-2.data-00000-of-00001" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/training_checkpoints/ckpt-2.index" beforeDir="false" />
+>>>>>>> cf75345c75f4da82db900aa6b6f2263c40d05386
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +42,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
     <option name="RESET_MODE" value="HARD" />
   </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" root0="FORCE_HIGHLIGHTING" />
+  </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
   </component>
@@ -52,25 +54,18 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
-    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;last_opened_file_path&quot;: &quot;P:/Downloads/DCGAN/GAN breakdown.md&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;
+<<<<<<< HEAD
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "C:/Users/axelb/Documents/GitHub",
+    "settings.editor.selected.configurable": "com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable"
   }
-}</component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\Tüge\PycharmProjects\WeGoUp\Mark III\wgu3_prediction_engine" />
-    </key>
-  </component>
-  <component name="RunManager">
-    <configuration name="main" type="PythonConfigurationType" factoryName="Python" singleton="false">
+}]]></component>
+  <component name="RunManager" selected="Python.position_manager">
+    <configuration name="main" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="Mark III" />
       <option name="INTERPRETER_OPTIONS" value="" />
       <option name="PARENT_ENVS" value="true" />
@@ -84,18 +79,95 @@
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Mark III/main.py" />
       <option name="PARAMETERS" value="" />
-      <option name="SHOW_COMMAND_LINE" value="true" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
       <option name="MODULE_MODE" value="false" />
       <option name="REDIRECT_INPUT" value="false" />
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="position_manager" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
+      <module name="Mark III" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Mark III/wgu3_position_manager" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Mark III/wgu3_position_manager/position_manager.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="proto_main" type="PythonConfigurationType" factoryName="Python" singleton="false" nameIsGenerated="true">
+      <module name="Mark III" />
+=======
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Tüge/PycharmProjects/WeGoUp/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.toDoOptions&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\Tüge\PycharmProjects\WeGoUp\Mark III\wgu3_prediction_engine" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="GAN_TEST_FILE" type="PythonConfigurationType" factoryName="Python" singleton="false">
+      <module name="WeGoUp" />
+>>>>>>> cf75345c75f4da82db900aa6b6f2263c40d05386
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="C:\ProgramData\Anaconda3\envs\TF-GAN310\python.exe" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Mark III/wgu3_prediction_engine" />
+      <option name="IS_MODULE_SDK" value="false" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Mark III/wgu3_prediction_engine/GAN_TEST_FILE.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="true" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python.position_manager" />
+        <item itemvalue="Python.main" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
       <changelist id="f3644d32-b599-4657-b44b-dda4cdb05279" name="Changes" comment="add comment here" />
+<<<<<<< HEAD
+      <created>1675775097201</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1675775097201</updated>
+    </task>
+=======
       <created>1668355513711</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
@@ -164,7 +236,120 @@
       <option name="project" value="LOCAL" />
       <updated>1671068677868</updated>
     </task>
-    <option name="localTasksCounter" value="10" />
+    <task id="LOCAL-00010" summary="begun adding log click event">
+      <created>1672603254636</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1672603254636</updated>
+    </task>
+    <task id="LOCAL-00011" summary="added log click event">
+      <created>1672843580159</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1672843580159</updated>
+    </task>
+    <task id="LOCAL-00012" summary="added histogram">
+      <created>1672866883581</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1672866883581</updated>
+    </task>
+    <task id="LOCAL-00013" summary="added ChatGPT Testbench">
+      <created>1672952776867</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1672952776867</updated>
+    </task>
+    <task id="LOCAL-00014" summary="broke while adding custom training loop">
+      <created>1673205508108</created>
+      <option name="number" value="00014" />
+      <option name="presentableId" value="LOCAL-00014" />
+      <option name="project" value="LOCAL" />
+      <updated>1673205508108</updated>
+    </task>
+    <task id="LOCAL-00015" summary="barebones training achieved again">
+      <created>1673476645414</created>
+      <option name="number" value="00015" />
+      <option name="presentableId" value="LOCAL-00015" />
+      <option name="project" value="LOCAL" />
+      <updated>1673476645414</updated>
+    </task>
+    <task id="LOCAL-00016" summary="currently implementing logs for callbacks">
+      <created>1673564431005</created>
+      <option name="number" value="00016" />
+      <option name="presentableId" value="LOCAL-00016" />
+      <option name="project" value="LOCAL" />
+      <updated>1673564431005</updated>
+    </task>
+    <task id="LOCAL-00017" summary="callbacks and metrics working">
+      <created>1673653243567</created>
+      <option name="number" value="00017" />
+      <option name="presentableId" value="LOCAL-00017" />
+      <option name="project" value="LOCAL" />
+      <updated>1673653243568</updated>
+    </task>
+    <task id="LOCAL-00018" summary="queues re-implemented">
+      <created>1673744152151</created>
+      <option name="number" value="00018" />
+      <option name="presentableId" value="LOCAL-00018" />
+      <option name="project" value="LOCAL" />
+      <updated>1673744152151</updated>
+    </task>
+    <task id="LOCAL-00019" summary="queues re-implemented">
+      <created>1673744164566</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1673744164566</updated>
+    </task>
+    <task id="LOCAL-00020" summary="queues not needed. got metrics to work">
+      <created>1673912106866</created>
+      <option name="number" value="00020" />
+      <option name="presentableId" value="LOCAL-00020" />
+      <option name="project" value="LOCAL" />
+      <updated>1673912106866</updated>
+    </task>
+    <task id="LOCAL-00021" summary="data feeding to the test_file, issues with the first 2 epochs not updating">
+      <created>1673999118901</created>
+      <option name="number" value="00021" />
+      <option name="presentableId" value="LOCAL-00021" />
+      <option name="project" value="LOCAL" />
+      <updated>1673999118901</updated>
+    </task>
+    <task id="LOCAL-00022" summary="new GUI framework on testbench">
+      <created>1674394138641</created>
+      <option name="number" value="00022" />
+      <option name="presentableId" value="LOCAL-00022" />
+      <option name="project" value="LOCAL" />
+      <updated>1674394138641</updated>
+    </task>
+    <task id="LOCAL-00023" summary="fixed unresponsive behavior">
+      <created>1674400152289</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1674400152289</updated>
+    </task>
+    <task id="LOCAL-00024" summary="progress bars andprediction gui implemented">
+      <created>1674605383912</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1674605383912</updated>
+    </task>
+    <task id="LOCAL-00025" summary="rmse and histogram work again and increased update rate of gui">
+      <created>1675122822679</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1675122822679</updated>
+    </task>
+    <option name="localTasksCounter" value="26" />
+>>>>>>> cf75345c75f4da82db900aa6b6f2263c40d05386
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -191,13 +376,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="trying to fix dependencies" />
-    <MESSAGE value="fixed local imports with Classed based selection between live and backtesting" />
-    <MESSAGE value="added Mark I and II" />
-    <MESSAGE value="added more modules" />
-    <MESSAGE value="trying ways to auto reload modules" />
-    <MESSAGE value="Architecture setup,&#10;formatting done,&#10;kernel exit added for reloading altered modules" />
-    <MESSAGE value="renaming main" />
     <MESSAGE value="." />
     <MESSAGE value="added partial threading" />
     <MESSAGE value="changed gan to prediction_engine" />
@@ -208,7 +386,22 @@
     <MESSAGE value="working first prototype of LSTM with 6 features. no batches and only partial dataset" />
     <MESSAGE value="added live visualisation and fixed rmse bug" />
     <MESSAGE value="added run method for testing" />
-    <option name="LAST_COMMIT_MESSAGE" value="added run method for testing" />
+    <MESSAGE value="begun adding log click event" />
+    <MESSAGE value="added log click event" />
+    <MESSAGE value="added histogram" />
+    <MESSAGE value="added ChatGPT Testbench" />
+    <MESSAGE value="broke while adding custom training loop" />
+    <MESSAGE value="barebones training achieved again" />
+    <MESSAGE value="currently implementing logs for callbacks" />
+    <MESSAGE value="callbacks and metrics working" />
+    <MESSAGE value="queues re-implemented" />
+    <MESSAGE value="queues not needed. got metrics to work" />
+    <MESSAGE value="data feeding to the test_file, issues with the first 2 epochs not updating" />
+    <MESSAGE value="new GUI framework on testbench" />
+    <MESSAGE value="fixed unresponsive behavior" />
+    <MESSAGE value="progress bars andprediction gui implemented" />
+    <MESSAGE value="rmse and histogram work again and increased update rate of gui" />
+    <option name="LAST_COMMIT_MESSAGE" value="rmse and histogram work again and increased update rate of gui" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
