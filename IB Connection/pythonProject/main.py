@@ -17,7 +17,7 @@ def run_loop():
 	app.run()
 
 app = IBapi()
-app.connect('127.0.0.1', 7497, 123)
+app.connect('127.0.0.1', 7497, 0)
 
 #Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
@@ -27,9 +27,9 @@ time.sleep(1) #Sleep interval to allow time for connection to server
 
 #Create contract object
 apple_contract = Contract()
-apple_contract.symbol = 'AAPL'
-apple_contract.secType = 'STK'
-apple_contract.exchange = 'SMART'
+apple_contract.symbol = 'ETH'
+apple_contract.secType = 'CRYPTO'
+apple_contract.exchange = 'PAXOS'
 apple_contract.currency = 'USD'
 
 #Request Market Data
